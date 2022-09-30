@@ -5,7 +5,7 @@ lock/
 python/
 sandbox/
 staging/
-.Rproj.user
+.Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
