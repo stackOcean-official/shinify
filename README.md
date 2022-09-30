@@ -1,4 +1,4 @@
-# hostR
+# shinify
 
 Automaticly creates a shiny server to interact with your machine learning model.
 
