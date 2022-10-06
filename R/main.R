@@ -69,7 +69,10 @@ shinify <- function(model, modeltype = "", title = "") {
     output$prediction <- renderText({
       df <- data.frame(matrix(ncol = input_count, nrow = 0))
       colnames(df) <- input_label
-      df[1, ] <- reactiveValuesToList(input)
+      df[1, ] <- sapply(1:input_count, function(i) {
+        req(input[[paste0("num", i)]])
+        input[[paste0("num", i)]]
+      })
       predicted_output <- predict(model, newdata = df)
       if (modeltype == "log_reg") {
         predicted_output <- sigmoid(predicted_output)
