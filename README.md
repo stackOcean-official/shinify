@@ -57,6 +57,8 @@ shinify(log_reg, modeltype = "log_reg", title = "your title here")
 ```
 
 ---
+After calling the `shinify()` method with the model, a shiny server is started where you can interact with your own model via a graphical interface.
+![shiny-server-preview](https://user-images.githubusercontent.com/28595283/194275509-2faa8937-922a-4006-978e-9f82b0044e04.png)
 
 ## Contributing
 
