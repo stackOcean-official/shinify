@@ -63,7 +63,7 @@ predict(rf, test_data_new)
 shinify(log_reg, modeltype = "log_reg", title = "your title here")
 
 # or host your random forest model 
-shinify(rf, modeltype = "log_reg", title = "your title here")
+shinify(rf, modeltype = "rf", title = "your title here")
 ```
 Note that you can only host one model at a time in the current development status. 
 
