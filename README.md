@@ -38,7 +38,7 @@ log_reg <- glm(legendary ~ attack + defense, data = data_train, family = binomia
 summary(log_reg)
 
 # actual random forest 
-rf = randomForest(legendary ~ attack + defense + sp_attack + sp_defense + speed + hp, data = data_train, proximity=TRUE)
+rf = randomForest(legendary ~ attack + defense, data = data_train, proximity=TRUE)
 print(rf)
 summary(rf)
 
