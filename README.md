@@ -17,11 +17,10 @@ devtools::install_github("stackOcean-official/shinify")
 In your code load the shinify package and after hand the model to our `shinify` function
 
 ```r
-library(readr)
 library(shinify)
 
 # load data
-data <- read_csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
+data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
 
 # create variables
 legendary <- data$is_legendary

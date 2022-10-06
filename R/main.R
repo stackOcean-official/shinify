@@ -49,7 +49,7 @@ shinify <- function(model, modeltype = "", title = "") {
     titlePanel(title),
     sidebarLayout(
       sidebarPanel(
-        # multipe inputs depending on number of expeced regressors from the ml model
+        # multiple inputs depending on number of expeced regressors from the ml model
         numinputs <- lapply(1:input_count, function(i) {
           numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
         })
