@@ -8,7 +8,7 @@
 #'
 #' This function creates a shiny server for your model
 #' @param model Your R model
-#' @param modeltype type of your model. Currently for "log_reg" or "lin_reg"
+#' @param modeltype type of your model. Currently for "log_reg", "lin_reg" and "rf"
 #' @keywords shiny
 #' @export
 #' @examples
@@ -74,7 +74,7 @@ shinify <- function(model, modeltype = "", title = "") {
         input[[paste0("num", i)]]
       })
       predicted_output <- predict(model, newdata = df)
-      if (modeltype == "log_reg") {
+      if (modeltype == "log_reg" || modeltype = "rf") {
         predicted_output <- sigmoid(predicted_output)
       }
       paste(round(predicted_output, digits = 4))

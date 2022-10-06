@@ -1,8 +1,8 @@
 # shinify
 
-Automaticly creates a shiny server to interact with your machine learning model.
+Automaticly creates a shiny server to interact with your machine learning or statistical model.
 
-> **_NOTE:_** This repository is still in an early stage of development and the functions are limited to linear and logistic regressions. We love the open source community and want to show what we are working on early. We will update this readme with more information. Until then, feel free to share your thoughts, contact us, and contribute if you'd like.
+> **_NOTE:_** This repository is still in an early stage of development and the functions are limited to linear and logistic regressions under the use of "lm" or "glm" functions and to random forests using the "randomForest" package. We love the open source community and want to show what we are working on early. We will update this readme with more information. Until then, feel free to share your thoughts, contact us, and contribute if you'd like.
 
 ---
 
@@ -14,10 +14,11 @@ Install the package from GitHub (If you don't have devtools, install it first: `
 devtools::install_github("stackOcean-official/shinify")
 ```
 
-In your code load the shinify package and after hand the model to our `shinify` function
+In your code load the shinify package and after that, hand your glm, lm or randomForest model over to our `shinify` function: 
 
 ```r
 library(shinify)
+library(randomForest)
 
 # load data
 data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -36,6 +37,10 @@ data_test <- data[(nrow(data) - 99):nrow(data), ]
 log_reg <- glm(legendary ~ attack + defense, data = data_train, family = binomial())
 summary(log_reg)
 
+# actual random forest 
+rf = randomForest(legendary ~ attack + defense + sp_attack + sp_defense + speed + hp, data = data_train, proximity=TRUE)
+print(rf)
+summary(rf)
 
 # input for new prediction
 attack <- 120
@@ -48,12 +53,19 @@ sigmoid <- function(x) {
   return(result)
 }
 
-# actual predicted percentage that pokemon is legendary
+# actual predicted percentage that pokemon is legendary with glm model
 sigmoid(predict(log_reg, test_data_new))
 
-# host model
+# actual predicted percentage that pokemon is legendary with rf model
+predict(rf, test_data_new)
+
+# host logistic model 
 shinify(log_reg, modeltype = "log_reg", title = "your title here")
+
+# or host your random forest model 
+shinify(rf, modeltype = "log_reg", title = "your title here")
 ```
+Note that you can only host one model at a time in the current development status. 
 
 ---
 After calling the `shinify()` method with the model, a shiny server is started where you can interact with your own model via a graphical interface.
