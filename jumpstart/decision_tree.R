@@ -14,7 +14,7 @@ data_train <- data[1:(nrow(data) - 100), ]
 data_test <- data[(nrow(data) - 99):nrow(data), ]
 
 # grow tree
-fit <- rpart(legendary ~ attack + defense, data = data_train,method="class")
+fit <- rpart(legendary ~ attack + defense, data = data_train, method="class")
 summary(fit)
 
 # input for new prediction
