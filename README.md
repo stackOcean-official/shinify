@@ -18,7 +18,6 @@ In your code load the shinify package and after that, hand your glm, lm or rando
 
 ```r
 library(shinify)
-library(randomForest)
 
 # load data
 data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -37,11 +36,6 @@ data_test <- data[(nrow(data) - 99):nrow(data), ]
 log_reg <- glm(legendary ~ attack + defense, data = data_train, family = binomial())
 summary(log_reg)
 
-# actual random forest 
-rf = randomForest(legendary ~ attack + defense, data = data_train, proximity=TRUE)
-print(rf)
-summary(rf)
-
 # input for new prediction
 attack <- 120
 defense <- 290
@@ -56,14 +50,9 @@ sigmoid <- function(x) {
 # actual predicted percentage that pokemon is legendary with glm model
 sigmoid(predict(log_reg, test_data_new))
 
-# actual predicted percentage that pokemon is legendary with rf model
-predict(rf, test_data_new)
-
-# host logistic model 
+# shinify logistic model 
 shinify(log_reg, modeltype = "log_reg", title = "your title here")
 
-# or host your random forest model 
-shinify(rf, modeltype = "rf", title = "your title here")
 ```
 Note that you can only host one model at a time in the current development status. 
 
