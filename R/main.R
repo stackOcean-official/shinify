@@ -8,7 +8,7 @@
 #'
 #' This function creates a shiny server for your model
 #' @param model Your R model
-#' @param modeltype type of your model. Currently for "log_reg", "lin_reg" and "rf"
+#' @param modeltype type of your model. Currently for "log_reg", "lin_reg","df_rpart", "dt_party" and "rf"
 #' @keywords shiny
 #' @export
 #' @examples
@@ -26,13 +26,21 @@ shinify <- function(model, modeltype = "", title = "") {
     install.packages("shinythemes")
     library(shinythemes)
   }
-  if (modeltype == "decision_tree" && !require(rpart)) {
+  if (modeltype == "dt_rpart" && !require(rpart)) {
     install.packages("rpart")
     library(rpart)
+  }
+  if (modeltype == "dt_party" && !require(party)) {
+    install.packages("party")
+    library(party)
   }
   if (modeltype == "svm" && !require(e1071)) {
     install.packages("e1071")
     library(e1071)
+  }
+  if (modeltype == "rf" && !require(randomForest)) {
+    install.packages("randomForest")
+    library(randomForest)
   }
 
   # set port for shiny server

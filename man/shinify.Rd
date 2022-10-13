@@ -7,7 +7,7 @@
 shinify(model, modeltype = "", title = "")
 }
 \arguments{
-\item{modeltype}{type of your model. Currently for "log_reg" or "lin_reg"}
+\item{modeltype}{type of your model. Currently for "log_reg", "lin_reg","df_rpart", "dt_party" and "rf"}
 
 \item{model}{Your R model}
 }

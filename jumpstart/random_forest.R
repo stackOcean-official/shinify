@@ -16,7 +16,6 @@ data_test <- data[(nrow(data) - 99):nrow(data), ]
 
 # actual random forest
 mod_rf <- randomForest(legendary ~ attack + defense, data = data_train)
-mod_rf
 summary(mod_rf)
 
 # input for new prediction
