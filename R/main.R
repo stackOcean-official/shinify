@@ -89,7 +89,7 @@ shinify <- function(model, modeltype = "", title = "") {
         predicted_output <- sigmoid(predicted_output)
       }
       if (modeltype == "decision_tree") {
-        predicted_output <- predicted_output[1]
+        predicted_output <- predicted_output[2]
       }
       paste(round(predicted_output, digits = 4))
     })
