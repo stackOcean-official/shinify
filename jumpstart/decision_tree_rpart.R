@@ -1,4 +1,5 @@
 library(shinify)
+library(rpart)
 
 # load data
 data = read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -13,23 +14,16 @@ data = data.frame(legendary, attack, defense)
 data_train = data[1:(nrow(data) - 100), ]
 data_test = data[(nrow(data) - 99):nrow(data), ]
 
-# actual logistic regression
-log_reg = glm(legendary ~ attack + defense, data = data_train, family = binomial())
-summary(log_reg)
+# actual decision tree
+d_tree = rpart(legendary ~ attack + defense, data = data_train, method="class")
 
 # input for new prediction
 attack = 120
 defense = 290
 test_data_new = data.frame(attack, defense)
 
-# definition of a sigmoid function to normalize predictions
-sigmoid = function(x) {
-  result = exp(x) / (1 + exp(x))
-  return(result)
-}
+# actual prediction that the pokemon is legendary
+predict(d_tree, newdata = data_test)
 
-# actual predicted percentage that pokemon is legendary with glm model
-sigmoid(predict(log_reg, test_data_new))
-
-# shinify logistic model
-shinify(log_reg, modeltype = "log_reg", title = "your title here")
+# shinify decision tree
+shinify(lin_reg, modeltype = "d_tree", title = "your title here")
