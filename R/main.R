@@ -26,6 +26,14 @@ shinify <- function(model, modeltype = "", title = "") {
     install.packages("shinythemes")
     library(shinythemes)
   }
+  if (modeltype == "decision_tree" && !require(rpart)) {
+    install.packages("rpart")
+    library(rpart)
+  }
+  if (modeltype == "svm" && !require(e1071)) {
+    install.packages("e1071")
+    library(e1071)
+  }
 
   # set port for shiny server
   options(shiny.port = 8000)
@@ -73,9 +81,15 @@ shinify <- function(model, modeltype = "", title = "") {
         req(input[[paste0("num", i)]])
         input[[paste0("num", i)]]
       })
+      # predict function
       predicted_output <- predict(model, newdata = df)
-      if (modeltype == "log_reg" || modeltype = "rf") {
+
+      # prepare output depending on the requirements by each ml model
+      if (modeltype == "log_reg") {
         predicted_output <- sigmoid(predicted_output)
+      }
+      if (modeltype == "decision_tree") {
+        predicted_output <- predicted_output[1]
       }
       paste(round(predicted_output, digits = 4))
     })
