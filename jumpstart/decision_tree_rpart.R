@@ -26,4 +26,4 @@ test_data_new = data.frame(attack, defense)
 predict(d_tree, newdata = test_data_new)
 
 # shinify decision tree
-shinify(lin_reg, modeltype = "d_tree", title = "your title here")
+shinify(d_tree, modeltype = "d_tree", title = "your title here")
