@@ -23,7 +23,7 @@ defense = 290
 test_data_new = data.frame(attack, defense)
 
 # actual prediction that the pokemon is legendary
-predict(d_tree, newdata = data_test)
+predict(d_tree, newdata = test_data_new)
 
 # shinify decision tree
 shinify(lin_reg, modeltype = "d_tree", title = "your title here")

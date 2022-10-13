@@ -25,7 +25,7 @@ defense = 290
 test_data_new = data.frame(attack, defense)
 
 # actual prediction that pokemon is legendary 
-predict(mod_rf, newdata = data_test)
+predict(mod_rf, newdata = test_data_new)
 
 # shinify random forest model 
 shinify(mod_rf, modeltype = "rf", title = "your title here")
