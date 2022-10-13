@@ -14,7 +14,8 @@ Install the package from GitHub (If you don't have devtools, install it first: `
 devtools::install_github("stackOcean-official/shinify")
 ```
 
-In your code load the shinify package and after that, hand your glm, lm or randomForest model over to our `shinify` function: 
+In your code load the shinify package and after that, hand your model over to our `shinify` function. Here is an example for a logistic regression. You can find more examples in the [jumpstart folder](https://github.com/stackOcean-official/shinify/tree/main/jumpstart)
+: 
 
 ```r
 library(shinify)
