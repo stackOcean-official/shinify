@@ -1,5 +1,5 @@
 library(shinify)
-library(rpart)
+library(e1071)
 
 # load data
 data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -14,9 +14,9 @@ data <- data.frame(legendary, attack, defense)
 data_train <- data[1:(nrow(data) - 100), ]
 data_test <- data[(nrow(data) - 99):nrow(data), ]
 
-# grow tree
-dt <- rpart(legendary ~ attack + defense, data = data_train, method = "class")
-summary(dt)
+# actual svm
+nb_mod <- naiveBayes(legendary ~ attack + defense, data = data_train)
+summary(nb_mod)
 
 # input for new prediction
 attack <- 120
@@ -24,8 +24,7 @@ defense <- 290
 test_data_new <- data.frame(attack, defense)
 
 # actual predicted percentage that pokemon is legendary with decision tree
-predict(dt, test_data_new)
+predict(nb_mod, test_data_new, "raw")
 
 # shinify logistic model
-shinify(dt, modeltype = "dt_rpart", title = "your title here")
-
+shinify(nb_mod, modeltype = "nb", title = "your title here", atributtes = c("output", "input 1", "input 2", "unused input 3"))

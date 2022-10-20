@@ -15,7 +15,8 @@
 #' shinify(model)
 #' shinify(model, "log_reg")
 #' shinify(model, "log_reg", "your awesome title")
-shinify <- function(model, modeltype = "", title = "") {
+
+shinify <- function(model, modeltype = "", title = "", atributtes = c()) {
 
   # load required packages
   if (!require(shiny)) {
@@ -34,7 +35,7 @@ shinify <- function(model, modeltype = "", title = "") {
     install.packages("party")
     library(party)
   }
-  if (modeltype == "svm" && !require(e1071)) {
+  if ((modeltype == "svm" || modeltype == "nb") && !require(e1071)) {
     install.packages("e1071")
     library(e1071)
   }
@@ -48,10 +49,20 @@ shinify <- function(model, modeltype = "", title = "") {
   options(shiny.host = "0.0.0.0")
 
   # set attr names from model (first = output, rest = input)
-  model_atributte <- paste(attr(model$terms, "predvars"))
-  model_label <- model_atributte[-1]
-  input_label <- model_label[-1]
-  input_count <- length(input_label)
+  if (!(is.null(model$terms)) && is.null(atributtes)) {
+    model_atributtes <- paste(attr(model$terms, "predvars"))
+    output_label <- model_atributtes[2]
+    input_label <- model_atributtes[c(-1,-2)]
+    input_count <- length(input_label)
+  } else if (!(is.null(atributtes)) && atributtes > 1) {
+    model_atributtes <- atributtes
+    output_label <- model_atributtes[1]
+    input_label <- model_atributtes[-1]
+    input_count <- length(input_label)
+  }
+  if (is.null(atributtes) && is.null(model$terms)) {
+    stop("The passed model does not contain values for input & output labels and you have not passed your own. Considder adding a vector of attributs. Note: First value is output and the rest are the input values.")
+  }
 
   # sigmoid function to correct output if using a log_reg
   sigmoid <- function(x) {
@@ -73,7 +84,7 @@ shinify <- function(model, modeltype = "", title = "") {
 
       # Output
       mainPanel(
-        h2(model_label[1]),
+        h2(output_label),
         h2(textOutput(outputId = "prediction")),
         tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank")
       )
@@ -96,7 +107,11 @@ shinify <- function(model, modeltype = "", title = "") {
       if (modeltype == "log_reg") {
         predicted_output <- sigmoid(predicted_output)
       }
-      if (modeltype == "decision_tree") {
+      if (modeltype == "dt_rpart") {
+        predicted_output <- predicted_output[2]
+      }
+      if (modeltype == "nb") {
+        predicted_output <- predict(model, newdata = df, "raw")
         predicted_output <- predicted_output[2]
       }
       paste(round(predicted_output, digits = 4))
