@@ -67,6 +67,8 @@ After calling the `shinify()` method with the model, a shiny server is started w
 ## Shinify function in detail
 
 The `shinify()` function creates a shiny server for your model
+
+```
 @param model Your R model
 @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
 @param title Optional: add a Headline to your shiny server
@@ -78,6 +80,7 @@ shinify(model)
 shinify(model, "log_reg")
 shinify(model, "log_reg", "your awesome title")
 shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
+```
 
 ## Contributing
 
