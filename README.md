@@ -94,7 +94,7 @@ These are the currently available options for `modeltype`. We are constantly wor
 
 | modeltype  | name of algorithm      |
 | ---------- | ---------------------- |
-| `dr_rpart` | Decision Tree Party    |
+| `dt_party` | Decision Tree Party    |
 | `dr_rpart` | Decision Tree rpart    |
 | `knn`      | k Nearest Neighbors    |
 | `lin_reg`  | Linear Regression      |
