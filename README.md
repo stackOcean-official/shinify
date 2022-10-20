@@ -64,6 +64,21 @@ Note that you can only host one model at a time in the current development statu
 After calling the `shinify()` method with the model, a shiny server is started where you can interact with your own model via a graphical interface.
 ![shiny-server-preview](https://user-images.githubusercontent.com/28595283/194275509-2faa8937-922a-4006-978e-9f82b0044e04.png)
 
+## Shinify function in detail
+
+The `shinify()` function creates a shiny server for your model
+@param model Your R model
+@param modeltype Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
+@param title Optional: add a Headline to your shiny server
+@param attributes Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.
+@keywords shiny
+@export
+@examples
+shinify(model)
+shinify(model, "log_reg")
+shinify(model, "log_reg", "your awesome title")
+shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
