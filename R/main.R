@@ -35,9 +35,13 @@ shinify <- function(model, modeltype = "", title = "", atributtes = c()) {
     install.packages("party")
     library(party)
   }
-  if ((modeltype == "svm" || modeltype == "nb") && !require(e1071)) {
+  if (modeltype == "svm" && !require(e1071)) {
     install.packages("e1071")
     library(e1071)
+  }
+  if (modeltype == "nb" && !require(naivebayes)) {
+    install.packages("naivebayes")
+    library(naivebayes)
   }
   if (modeltype == "rf" && !require(randomForest)) {
     install.packages("randomForest")
@@ -111,7 +115,7 @@ shinify <- function(model, modeltype = "", title = "", atributtes = c()) {
         predicted_output <- predicted_output[2]
       }
       if (modeltype == "nb") {
-        predicted_output <- predict(model, newdata = df, "raw")
+        predicted_output <- predict(model, newdata = df, "prob")
         predicted_output <- predicted_output[2]
       }
       paste(round(predicted_output, digits = 4))
