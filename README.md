@@ -86,6 +86,7 @@ The `shinify()` function creates a shiny server for your model
 
 | Prop       | Type   | Required | Default | Description                                                                                                                                        |
 | ---------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| model      | model  | `yes`    | ""      | Your R model (output from statistics / machine learning algorithm)                                                                                 |
 | modeltype  | string | `no`     | ""      | Abbreviation of your model type that determines. See table below for possible configuration                                                        |
 | title      | string | `no`     | ""      | Sets the title visible in the shiny application                                                                                                    |
 | attributes | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms. |
