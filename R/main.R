@@ -8,15 +8,18 @@
 #'
 #' This function creates a shiny server for your model
 #' @param model Your R model
-#' @param modeltype type of your model. Currently for "log_reg", "lin_reg","df_rpart", "dt_party" and "rf"
+#' @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
+#' @param title Optional: add a Headline to your shiny server
+#' @param attributes Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.
 #' @keywords shiny
 #' @export
 #' @examples
 #' shinify(model)
 #' shinify(model, "log_reg")
 #' shinify(model, "log_reg", "your awesome title")
+#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
 
-shinify <- function(model, modeltype = "", title = "", atributtes = c()) {
+shinify <- function(model, modeltype = "", title = "", attributes = c()) {
 
   # load required packages
   if (!require(shiny)) {
@@ -49,18 +52,18 @@ shinify <- function(model, modeltype = "", title = "", atributtes = c()) {
   options(shiny.host = "0.0.0.0")
 
   # set attr names from model (first = output, rest = input)
-  if (!(is.null(model$terms)) && is.null(atributtes)) {
-    model_atributtes <- paste(attr(model$terms, "predvars"))
-    output_label <- model_atributtes[2]
-    input_label <- model_atributtes[c(-1,-2)]
+  if (!(is.null(model$terms)) && is.null(attributes)) {
+    model_attributes <- paste(attr(model$terms, "predvars"))
+    output_label <- model_attributes[2]
+    input_label <- model_attributes[c(-1,-2)]
     input_count <- length(input_label)
-  } else if (!(is.null(atributtes)) && atributtes > 1) {
-    model_atributtes <- atributtes
-    output_label <- model_atributtes[1]
-    input_label <- model_atributtes[-1]
+  } else if (!(is.null(attributes)) && attributes > 1) {
+    model_attributes <- attributes
+    output_label <- model_attributes[1]
+    input_label <- model_attributes[-1]
     input_count <- length(input_label)
   }
-  if (is.null(atributtes) && is.null(model$terms)) {
+  if (is.null(attributes) && is.null(model$terms)) {
     stop("The passed model does not contain values for input & output labels and you have not passed your own. Considder adding a vector of attributs. Note: First value is output and the rest are the input values.")
   }
 
