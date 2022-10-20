@@ -86,9 +86,21 @@ The `shinify()` function creates a shiny server for your model
 
 | Prop       | Type   | Required | Default | Description                                                                                                                                        |
 | ---------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| modeltype  | string | `no`     | ""      | Specifies which output function should be use. Possible modeltypes are `log_reg`, `dt_rpart`, `dt_party`, `svm` and `rf`                           |
+| modeltype  | string | `no`     | ""      | Abbreviation of your model type that determines. See table below for possible configuration                                                        |
 | title      | string | `no`     | ""      | Sets the title visible in the shiny application                                                                                                    |
 | attributes | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms. |
+
+These are the currently available options for `modeltype`. We are constantly working on adding new models and packages to support with shinify. Please [write an issue](https://github.com/stackOcean-official/shinify/issues/new) if your modeltype is missing 💪
+
+| modeltype  | name of algorithm      |
+| ---------- | ---------------------- |
+| `dr_rpart` | Decision Tree Party    |
+| `dr_rpart` | Decision Tree rpart    |
+| `knn`      | k Nearest Neighbors    |
+| `lin_reg`  | Linear Regression      |
+| `log_reg`  | Logistic Regression    |
+| `svm`      | Support Vector Machine |
+| `rf`       | Random Forest          |
 
 Here are some examples how to call the `shinify` function:
 
