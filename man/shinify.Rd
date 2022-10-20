@@ -4,12 +4,16 @@
 \alias{shinify}
 \title{Shiny Server}
 \usage{
-shinify(model, modeltype = "", title = "")
+shinify(model, modeltype = "", title = "", attributes = c())
 }
 \arguments{
-\item{modeltype}{type of your model. Currently for "log_reg", "lin_reg","df_rpart", "dt_party" and "rf"}
-
 \item{model}{Your R model}
+
+\item{modeltype}{Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.}
+
+\item{title}{Optional: add a Headline to your shiny server}
+
+\item{attributes}{Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.}
 }
 \description{
 This function creates a shiny server for your model
@@ -18,5 +22,6 @@ This function creates a shiny server for your model
 shinify(model)
 shinify(model, "log_reg")
 shinify(model, "log_reg", "your awesome title")
+shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
 }
 \keyword{shiny}
