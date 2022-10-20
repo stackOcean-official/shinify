@@ -1,11 +1,10 @@
 # shinify
 
-## No more coding needed, just add one line to your script in which you call our magic shinify function. 
+## No more coding needed, just add one line to your script in which you call our magic shinify function.
 
 Shinify automatically creates a shiny server and visual interface for you to interact with your machine learning or statistical model.
 
-> **_NOTE:_** This repository is still in an early stage of development and the functions are limited. We are constantly working on adding new models and packages to support with shinify. Take a look in the jumpstart folder for currently supported models and libraries. We love the open source community and want to show what we are working on early. We will update this readme with more information. Until then, feel free to share your thoughts, contact us, and contribute if you'd like.
-
+> :warning: This repository is still in an early stage of development and the functions are limited. We are constantly working on adding new models and packages to support with shinify. Take a look in the jumpstart folder for currently supported models and libraries. We love the open source community and want to show what we are working on early. We will update this readme with more information. Until then, feel free to share your thoughts, contact us, and contribute if you'd like.
 
 ---
 
@@ -17,8 +16,23 @@ Install the package from GitHub (If you don't have devtools, install it first: `
 devtools::install_github("stackOcean-official/shinify")
 ```
 
-In your code load the shinify package and after that, hand your model over to our `shinify` function. Here is an example for a logistic regression. You can find more examples in the [jumpstart folder](https://github.com/stackOcean-official/shinify/tree/main/jumpstart)
-: 
+In your code load the shinify package and after that, just hand your model over to our `shinify` function to start a R Shiny server and let shinify figure out all the configuration.
+
+```r
+# load shinify package
+library(shinify)
+
+# do your logistic regression or other algorithms
+log_reg <- glm(...)
+
+# let shinify transform it into a shiny server
+shinify(log_reg)
+```
+
+![shinify-example](https://user-images.githubusercontent.com/675065/196923840-11cb971b-990f-46b2-a389-de92e3d1fa44.png)
+
+Here is the full example for a logistic regression. You can find more examples in the [jumpstart folder](https://github.com/stackOcean-official/shinify/tree/main/jumpstart)
+:
 
 ```r
 library(shinify)
@@ -54,13 +68,15 @@ sigmoid <- function(x) {
 # actual predicted percentage that pokemon is legendary with glm model
 sigmoid(predict(log_reg, test_data_new))
 
-# shinify logistic model 
+# shinify logistic model
 shinify(log_reg, modeltype = "log_reg", title = "your title here")
 
 ```
-Note that you can only host one model at a time in the current development status. 
+
+Note that you can only host one model at a time in the current development status.
 
 ---
+
 After calling the `shinify()` method with the model, a shiny server is started where you can interact with your own model via a graphical interface.
 ![shiny-server-preview](https://user-images.githubusercontent.com/28595283/194275509-2faa8937-922a-4006-978e-9f82b0044e04.png)
 
@@ -68,18 +84,23 @@ After calling the `shinify()` method with the model, a shiny server is started w
 
 The `shinify()` function creates a shiny server for your model
 
+| Prop       | Type   | Required | Default | Description                                                                                                                                        |
+| ---------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| modeltype  | string | `no`     | ""      | Specifies which output function should be use. Possible modeltypes are `log_reg`, `dt_rpart`, `dt_party`, `svm` and `rf`                           |
+| title      | string | `no`     | ""      | Sets the title visible in the shiny application                                                                                                    |
+| attributes | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms. |
+
+Here are some examples how to call the `shinify` function:
+
 ```r
-@param model Your R model
-@param modeltype Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
-@param title Optional: add a Headline to your shiny server
-@param attributes Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.
-@keywords shiny
-@export
-@examples
+# just call shinify with a simple model
 shinify(model)
-shinify(model, "log_reg")
-shinify(model, "log_reg", "your awesome title")
-shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
+
+# call shinify with a log_reg modeltype and the title "awesome discovery" in the shiny app
+shinify(model, modeltype="log_reg", "awesome discovery")
+
+# call shinify with a svm modeltype and labels for input and outputs
+shinify(model, modeltype="svm", "your awesome title", c("output", "input 1", "input 2"))
 ```
 
 ## Contributing
