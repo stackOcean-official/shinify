@@ -1,6 +1,8 @@
 # shinify
 
-Automaticly creates a shiny server to interact with your machine learning or statistical model.
+## No more coding needed, just add one line to your script in which you call our magic shinify function. 
+
+Shinify automatically creates a shiny server and visual interface for you to interact with your machine learning or statistical model.
 
 > **_NOTE:_** This repository is still in an early stage of development and the functions are limited. We are constantly working on adding new models and packages to support with shinify. Take a look in the jumpstart folder for currently supported models and libraries. We love the open source community and want to show what we are working on early. We will update this readme with more information. Until then, feel free to share your thoughts, contact us, and contribute if you'd like.
 
