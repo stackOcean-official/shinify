@@ -4,7 +4,11 @@ Title: Creates a shiny server to interact with your machine learning model.
 Version: 0.1.0
 Author: Christopher Ernst & Jonas Mielck | stackOcean GmbH
 Maintainer: The package maintainer <hello@stackocean.com>
-Description: This package automaticly creates a shiny server to interact with your machine learning models. As the project is in the early development phase we currently support some selected models. Take a look in the jumpstart folder for currently supported models and libraries. The package creates a basic GUI with fields for input and output value depending on your model terms. No furhter coding is needed - simply enjoy and share your model.
+Description: This package automaticly creates a shiny server to interact with your machine learning models. 
+  As the project is in the early development phase we currently support some selected models. 
+  Take a look in the jumpstart folder for currently supported models and libraries. 
+  The package creates a basic GUI with fields for input and output value depending on your model terms. 
+  No furhter coding is needed - simply enjoy and share your model.
 License: MIT License
 Encoding: UTF-8
 LazyData: true
