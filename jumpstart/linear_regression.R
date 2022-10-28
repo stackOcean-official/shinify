@@ -27,16 +27,3 @@ predict(lin_reg, test_data_new)
 
 # shinify linear regression
 shinify(lin_reg, modeltype = "lin_reg", title = "your title here")
-
-a <- NULL
-b <- NULL
-c <- NULL
-if (is.null(a)) {
-  stop_msg <- ""
-  if (is.null(b)) {
-    stop_msg <- paste(stop_msg, "You have not set the names for your model attributes and the passed model does not contain this information. Considder adding the vector `attr_names` to your function call. Note: First value is output and the rest are the input values.")
-  } else if (is.null(c)) {
-    stop_msg <- paste(stop_msg, "You have not set the type for your model attributes and the passed model does not contain this information. Considder adding the vector `attr_types` to your function call. Note: First value is output and the rest are the input values.")
-  }
-  print(stop_msg)
-}

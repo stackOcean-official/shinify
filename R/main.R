@@ -11,7 +11,7 @@
 #' @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
 #' @param title Optional: add a Headline to your shiny server
 #' @param attr_names Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.
-#' @param attr_types Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.
+#' @param attr_types Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values. If CSV is part of your input types, it will ignore all others.
 #' @keywords shiny
 #' @export
 #' @examples
@@ -72,20 +72,34 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     titlePanel(title),
     sidebarLayout(
       sidebarPanel(
-        # multiple inputs depending on number of expeced regressors from the ml model
-        inputs <- lapply(1:input_count, function(i) {
-          if (input_type[i] == "numeric" || input_type[i] == "integer" || input_type[i] == "double") {
-            numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
-          } else if (input_type[i] == "string" || input_type[i] == "factor") {
-            textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
-          }
-        })
+        if (is.element(tolower("csv"), tolower(input_type))) {
+          fileInput("file1", "Choose CSV File",
+            accept = c(
+              "text/csv",
+              "text/comma-separated-values,text/plain",
+              ".csv"
+            )
+          )
+        } else {
+          # multiple inputs depending on number of expeced regressors from the ml model
+          inputs <- lapply(1:input_count, function(i) {
+            if (input_type[i] == "numeric" || input_type[i] == "integer" || input_type[i] == "double") {
+              numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
+            } else if (input_type[i] == "string" || input_type[i] == "factor") {
+              textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
+            }
+          })
+        }
       ),
 
       # Output
       mainPanel(
         h2(output_label),
-        h2(textOutput(outputId = "prediction")),
+        if (is.element(tolower("csv"), tolower(input_type))) {
+          tableOutput("contents")
+        } else {
+          h2(textOutput(outputId = "prediction"))
+        },
         tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank")
       )
     )
@@ -93,6 +107,21 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
 
   # Define server function
   server <- function(input, output) {
+    output$contents <- renderTable({
+      # input$file1 will be NULL initially. After the user selects
+      # and uploads a file, it will be a data frame with 'name',
+      # 'size', 'type', and 'datapath' columns. The 'datapath'
+      # column will contain the local filenames where the data can
+      # be found.
+      inFile <- input$file1
+
+      if (is.null(inFile)) {
+        return(NULL)
+      }
+
+      read.csv(inFile$datapath)
+    })
+
     output$prediction <- renderText({
       df <- data.frame(matrix(ncol = input_count, nrow = 0))
       colnames(df) <- input_label
