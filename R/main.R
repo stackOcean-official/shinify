@@ -19,7 +19,7 @@
 #' shinify(model, "log_reg")
 #' shinify(model, "log_reg", "your awesome title")
 #' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
-#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense", c("numeric", "numeric", "numeric")))
+#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense"), c("numeric", "numeric", "numeric"))
 
 
 shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_types = c()) {
@@ -43,7 +43,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     stop(stop_msg)
   }
 
-  if (!(is.null(model$terms)) && is.null(attr_names)) {
+  if (is.null(attr_names)) {
     model_attr_names <- paste(attr(model$terms, "predvars"))[-1]
     output_label <- model_attr_names[1]
     input_label <- model_attr_names[-1]
@@ -54,7 +54,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     input_label <- model_attr_names[-1]
     input_count <- length(input_label)
   }
-  if (!(is.null(model$terms)) && is.null(attr_types)) {
+  if (is.null(attr_types)) {
     input_type <- paste(attr(model$terms, "dataClasses"))[-1]
   } else {
     input_type <- attr_types[-1]
