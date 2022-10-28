@@ -31,6 +31,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   options(shiny.host = "0.0.0.0")
 
   # set attr names and type from model (first = output, rest = input)
+  # ToDo: check if model$terms and attr_names & attr_types same lenght
   if (is.null(model$terms)) {
     stop_msg <- "function call:"
     if (is.null(attr_names)) {
@@ -60,6 +61,10 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     input_type <- attr_types[-1]
   }
 
+  if (length(input_type) != input_count) {
+    stop("Mismatch: The number of input variables is not determined correctly.\n If you set the attr_names or attr_types manually, make sure that they meet the requirements of the model.")
+  }
+
   # sigmoid function to correct output if using a log_reg
   sigmoid <- function(x) {
     result <- exp(x) / (1 + exp(x))
@@ -73,7 +78,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     sidebarLayout(
       sidebarPanel(
         if (is.element(tolower("csv"), tolower(input_type))) {
-          fileInput("file1", "Choose CSV File",
+          fileInput("upload", "Choose CSV File",
             accept = c(
               "text/csv",
               "text/comma-separated-values,text/plain",
@@ -108,12 +113,12 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   # Define server function
   server <- function(input, output) {
     output$contents <- renderTable({
-      # input$file1 will be NULL initially. After the user selects
+      # input$upload will be NULL initially. After the user selects
       # and uploads a file, it will be a data frame with 'name',
       # 'size', 'type', and 'datapath' columns. The 'datapath'
       # column will contain the local filenames where the data can
       # be found.
-      inFile <- input$file1
+      inFile <- input$upload
 
       if (is.null(inFile)) {
         return(NULL)
