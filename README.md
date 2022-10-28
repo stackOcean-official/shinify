@@ -89,8 +89,8 @@ The `shinify()` function creates a shiny server for your model
 | model      | model  | `yes`    | ""      | Your R model (output from statistics / machine learning algorithm)                                                                                 |
 | modeltype  | string | `no`     | ""      | Abbreviation of your model type that determines. See table below for possible configuration                                                        |
 | title      | string | `no`     | ""      | Sets the title visible in the shiny application                                                                                                    |
-| attributes | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms. |
-
+| attr_names | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms.
+| attr_types | vector | `no`      | c()    | Change the type for your input and output variables (first element is output type). Mandatory if the passed model has no model terms. |                                        
 These are the currently available options for `modeltype`. We are constantly working on adding new models and packages to support with shinify. Please [write an issue](https://github.com/stackOcean-official/shinify/issues/new) if your modeltype is missing 💪
 
 | modeltype  | name of algorithm      |

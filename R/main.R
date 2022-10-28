@@ -8,9 +8,10 @@
 #'
 #' This function creates a shiny server for your model
 #' @param model Your R model
-#' @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
+#' @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
 #' @param title Optional: add a Headline to your shiny server
-#' @param attributes Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.
+#' @param attr_names Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.
+#' @param attr_types Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.
 #' @keywords shiny
 #' @export
 #' @examples
@@ -18,53 +19,45 @@
 #' shinify(model, "log_reg")
 #' shinify(model, "log_reg", "your awesome title")
 #' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
+#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense", c("numeric", "numeric", "numeric")))
 
-shinify <- function(model, modeltype = "", title = "", attributes = c()) {
 
+shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_types = c()) {
   # load required packages
-  if (!require(shiny)) {
-    install.packages("shiny")
-    library(shiny)
-  }
-  if (!require(shinythemes)) {
-    install.packages("shinythemes")
-    library(shinythemes)
-  }
-  if (modeltype == "dt_rpart" && !require(rpart)) {
-    install.packages("rpart")
-    library(rpart)
-  }
-  if (modeltype == "dt_party" && !require(party)) {
-    install.packages("party")
-    library(party)
-  }
-  if (modeltype == "svm" && !require(e1071)) {
-    install.packages("e1071")
-    library(e1071)
-  }
-  if (modeltype == "rf" && !require(randomForest)) {
-    install.packages("randomForest")
-    library(randomForest)
-  }
+  requiredPackages(modeltype)
 
   # set port for shiny server
   options(shiny.port = 8000)
   options(shiny.host = "0.0.0.0")
 
-  # set attr names from model (first = output, rest = input)
-  if (!(is.null(model$terms)) && is.null(attributes)) {
-    model_attributes <- paste(attr(model$terms, "predvars"))
-    output_label <- model_attributes[2]
-    input_label <- model_attributes[c(-1,-2)]
+  # set attr names and type from model (first = output, rest = input)
+  if (is.null(model$terms)) {
+    stop_msg <- "function call:"
+    if (is.null(attr_names)) {
+      stop_msg <- paste(stop_msg, "\n You have not set the names for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_names`.")
+    }
+    if (is.null(attr_types)) {
+      stop_msg <- paste(stop_msg, "\n You have not set the type for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_types`.")
+    }
+    stop_msg <- paste(stop_msg, "\n Note: First value is output and the rest are the input values.")
+    stop(stop_msg)
+  }
+
+  if (!(is.null(model$terms)) && is.null(attr_names)) {
+    model_attr_names <- paste(attr(model$terms, "predvars"))[-1]
+    output_label <- model_attr_names[1]
+    input_label <- model_attr_names[-1]
     input_count <- length(input_label)
-  } else if (!(is.null(attributes)) && attributes > 1) {
-    model_attributes <- attributes
-    output_label <- model_attributes[1]
-    input_label <- model_attributes[-1]
+  } else {
+    model_attr_names <- attr_names
+    output_label <- model_attr_names[1]
+    input_label <- model_attr_names[-1]
     input_count <- length(input_label)
   }
-  if (is.null(attributes) && is.null(model$terms)) {
-    stop("The passed model does not contain values for input & output labels and you have not passed your own. Considder adding a vector of attributs. Note: First value is output and the rest are the input values.")
+  if (!(is.null(model$terms)) && is.null(attr_types)) {
+    input_type <- paste(attr(model$terms, "dataClasses"))[-1]
+  } else {
+    input_type <- attr_types[-1]
   }
 
   # sigmoid function to correct output if using a log_reg
@@ -80,8 +73,12 @@ shinify <- function(model, modeltype = "", title = "", attributes = c()) {
     sidebarLayout(
       sidebarPanel(
         # multiple inputs depending on number of expeced regressors from the ml model
-        numinputs <- lapply(1:input_count, function(i) {
-          numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
+        inputs <- lapply(1:input_count, function(i) {
+          if (input_type[i] == "numeric" || input_type[i] == "integer" || input_type[i] == "double") {
+            numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
+          } else if (input_type[i] == "string" || input_type[i] == "factor") {
+            textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
+          }
         })
       ),
 
@@ -119,4 +116,32 @@ shinify <- function(model, modeltype = "", title = "", attributes = c()) {
 
   # Create Shiny object
   shinyApp(ui = ui, server = server)
+}
+
+# function to load all required packages
+requiredPackages <- function(modeltype = "") {
+  if (!require(shiny)) {
+    install.packages("shiny")
+    library(shiny)
+  }
+  if (!require(shinythemes)) {
+    install.packages("shinythemes")
+    library(shinythemes)
+  }
+  if (modeltype == "dt_rpart" && !require(rpart)) {
+    install.packages("rpart")
+    library(rpart)
+  }
+  if (modeltype == "dt_party" && !require(party)) {
+    install.packages("party")
+    library(party)
+  }
+  if (modeltype == "svm" && !require(e1071)) {
+    install.packages("e1071")
+    library(e1071)
+  }
+  if (modeltype == "rf" && !require(randomForest)) {
+    install.packages("randomForest")
+    library(randomForest)
+  }
 }
