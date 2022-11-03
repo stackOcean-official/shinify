@@ -31,7 +31,6 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   options(shiny.host = "0.0.0.0")
 
   # set attr names and type from model (first = output, rest = input)
-  # ToDo: check if model$terms and attr_names & attr_types same lenght
   if (is.null(model$terms)) {
     stop_msg <- "function call:"
     if (is.null(attr_names)) {
@@ -42,6 +41,18 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     }
     stop_msg <- paste(stop_msg, "\n Note: First value is output and the rest are the input values.")
     stop(stop_msg)
+  }
+
+  if (is.null(attr_types)) {
+    input_type <- paste(attr(model$terms, "dataClasses"))[-1]
+  } else {
+    input_type <- attr_types[-1]
+  }
+
+  if (is.element(tolower("csv"), tolower(input_type))) {
+    csv_input <- TRUE
+  } else {
+    csv_input <- FALSE
   }
 
   if (is.null(attr_names)) {
@@ -55,13 +66,8 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     input_label <- model_attr_names[-1]
     input_count <- length(input_label)
   }
-  if (is.null(attr_types)) {
-    input_type <- paste(attr(model$terms, "dataClasses"))[-1]
-  } else {
-    input_type <- attr_types[-1]
-  }
 
-  if (length(input_type) != input_count) {
+  if (length(input_type) != input_count && !csv_input) {
     stop("Mismatch: The number of input variables is not determined correctly.\n If you set the attr_names or attr_types manually, make sure that they meet the requirements of the model.")
   }
 
@@ -76,8 +82,10 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     theme = shinytheme("lumen"),
     titlePanel(title),
     sidebarLayout(
-      sidebarPanel(
-        if (is.element(tolower("csv"), tolower(input_type))) {
+      if (csv_input) {
+        sidebarPanel(
+          textInput(inputId = "sep", label = "seperator", value = ";"),
+          checkboxInput("header", "Header", TRUE),
           fileInput("upload", "Choose CSV File",
             accept = c(
               "text/csv",
@@ -85,7 +93,9 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
               ".csv"
             )
           )
-        } else {
+        )
+      } else {
+        sidebarPanel(
           # multiple inputs depending on number of expeced regressors from the ml model
           inputs <- lapply(1:input_count, function(i) {
             if (input_type[i] == "numeric" || input_type[i] == "integer" || input_type[i] == "double") {
@@ -94,13 +104,13 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
               textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
             }
           })
-        }
-      ),
+        )
+      },
 
       # Output
       mainPanel(
         h2(output_label),
-        if (is.element(tolower("csv"), tolower(input_type))) {
+        if (csv_input) {
           tableOutput("contents")
         } else {
           h2(textOutput(outputId = "prediction"))
@@ -119,14 +129,17 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
       # column will contain the local filenames where the data can
       # be found.
       inFile <- input$upload
-
       if (is.null(inFile)) {
         return(NULL)
       }
-
-      read.csv(inFile$datapath)
+      csv_data <- read.csv(inFile$datapath, header = input$header, sep = input$sep)
+      csv_data$output <- predict(model, newdata = csv_data)
+      csv_data
     })
-
+    output$prediction <- renderTable({
+      predicted_output <- predict(model, newdata = csv_data)
+      print("csv predicted")
+    })
     output$prediction <- renderText({
       df <- data.frame(matrix(ncol = input_count, nrow = 0))
       colnames(df) <- input_label
