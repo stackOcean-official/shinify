@@ -30,7 +30,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   options(shiny.port = 8000)
   options(shiny.host = "0.0.0.0")
 
-  # set attr names and type from model (first = output, rest = input)
+  # check if given model has terms and attributes. If not and no additional information from the user stop the code and print msg.
   if (modeltype == "dt_party" || is.null(model$terms)) {
     stop_msg <- "function call:"
     count <- 0
@@ -48,6 +48,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     }
   }
 
+  # set attr names and type from model (first = output, rest = input)
   if (is.null(attr_types)) {
     input_type <- paste(attr(model$terms, "dataClasses"))[-1]
   } else {
