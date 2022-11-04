@@ -32,9 +32,9 @@ jobs:
           r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "devtools"))
+          install.packages(c("remotes", "githubinstall"))
           remotes::install_deps(dependencies = TRUE)
-          devtools::install_github("stackOcean-official/shinify")
+          install.packages("shinify")
         shell: Rscript {0}
       - name: Test linear
         run: |
