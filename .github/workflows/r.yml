@@ -32,8 +32,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "devtools"))
-          remotes::install_deps(dependencies = TRUE)
+          install.packages(c("devtools"))
           devtools::install_github("stackOcean-official/shinify")
         shell: Rscript {0}
       - name: Test linear
