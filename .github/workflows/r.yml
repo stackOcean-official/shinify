@@ -30,4 +30,13 @@ jobs:
         with:
           r-version: ${{ matrix.r-version }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: |
+          install.packages("devtools")
+          devtools::install_github("stackOcean-official/shinify", host = "https://api.github.com")
+        shell: Rscript {0}
+      - name: Test linear
+        run: |
+          source("jumpstart/linear_regression.R")
+        shell: Rscript {0} 
       
