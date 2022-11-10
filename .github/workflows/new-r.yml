@@ -6,38 +6,35 @@
 # See https://github.com/r-lib/actions/tree/master/examples#readme for
 # additional example workflows available for the R community.
 
-name: R
+name: New R
 
 on:
   push:
-    branches: []
+    branches: ["main"]
   pull_request:
-    branches: []
+    branches: ["main"]
 
 permissions:
   contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
-        r-version: ["release"]
+        r-version: ["4.1.1"]
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
         with:
           r-version: ${{ matrix.r-version }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install xmllint
-        run: sudo apt-get install -y libcurl4-openssl-dev
       - name: Install dependencies
         run: |
-          install.packages("devtools")
-          devtools::install_github("stackOcean-official/shinify", host = "https://api.github.com")
+          install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
-      - name: Test linear
-        run: |
-          source("jumpstart/linear_regression.R")
+      - name: Check
+        run: rcmdcheck::rcmdcheck (args = c("--no-examples", "--no-manual"), error_on = "error")
         shell: Rscript {0}
