@@ -4,16 +4,18 @@
 \alias{shinify}
 \title{Shiny Server}
 \usage{
-shinify(model, modeltype = "", title = "", attributes = c())
+shinify(model, modeltype = "", title = "", attr_names = c(), attr_types = c())
 }
 \arguments{
 \item{model}{Your R model}
 
-\item{modeltype}{Abbreviation of your model type (e.g. "log_reg", "rf", ...). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.}
+\item{modeltype}{Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.}
 
 \item{title}{Optional: add a Headline to your shiny server}
 
-\item{attributes}{Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms.}
+\item{attr_names}{Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.}
+
+\item{attr_types}{Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values. If CSV is part of your input types, it will ignore all others.}
 }
 \description{
 This function creates a shiny server for your model
@@ -23,5 +25,6 @@ shinify(model)
 shinify(model, "log_reg")
 shinify(model, "log_reg", "your awesome title")
 shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
+shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense"), c("numeric", "numeric", "numeric"))
 }
 \keyword{shiny}
