@@ -10,9 +10,9 @@ name: R
 
 on:
   push:
-    branches: [ "main" ]
+    branches: []
   pull_request:
-    branches: [ "main" ]
+    branches: []
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        r-version: ['release']
+        r-version: ["release"]
     steps:
       - uses: actions/checkout@v3
       - name: Set up R ${{ matrix.r-version }}
@@ -40,5 +40,4 @@ jobs:
       - name: Test linear
         run: |
           source("jumpstart/linear_regression.R")
-        shell: Rscript {0} 
-      
+        shell: Rscript {0}
