@@ -193,27 +193,27 @@ sigmoid <- function(x) {
 # function to load all required packages
 requiredPackages <- function(modeltype) {
   if (!requireNamespace("shiny", quietly=TRUE)) {
-    install.packages("shiny")
+    install.packages("shiny", repos = "http://cran.us.r-project.org")
     library(shiny)
   }
   if (!requireNamespace("shinythemes", quietly=TRUE)) {
-    install.packages("shinythemes")
+    install.packages("shinythemes", repos = "http://cran.us.r-project.org")
     library(shinythemes)
   }
   if (modeltype == "dt_rpart" && !requireNamespace("rpart", quietly=TRUE)) {
-    install.packages("rpart")
+    install.packages("rpart", repos = "http://cran.us.r-project.org")
     library(rpart)
   }
   if (modeltype == "dt_party" && !requireNamespace("party", quietly=TRUE)) {
-    install.packages("party")
+    install.packages("party", repos = "http://cran.us.r-project.org")
     library(party)
   }
   if (modeltype == "svm" && !requireNamespace("e1071", quietly=TRUE)) {
-    install.packages("e1071")
+    install.packages("e1071", repos = "http://cran.us.r-project.org")
     library(e1071)
   }
   if (modeltype == "rf" && !requireNamespace("randomForest", quietly=TRUE)) {
-    install.packages("randomForest")
+    install.packages("randomForest", repos = "http://cran.us.r-project.org")
     library(randomForest)
   }
 }
