@@ -20,6 +20,8 @@
 #' shinify(model, "log_reg", "your awesome title")
 #' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
 #' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense"), c("numeric", "numeric", "numeric"))
+#' @importFrom stats predict
+#' @importFrom utils install.packages read.csv write.csv
 
 
 shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_types = c()) {
