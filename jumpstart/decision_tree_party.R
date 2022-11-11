@@ -22,4 +22,4 @@ summary(dt)
 predict(dt, data_test, type = "response")
 
 # shinify decision tree
-shinify(dt, modeltype = "dt_party", title = "your title here")
+shinify(dt, modeltype = "dt_party", title = "your title here", attr_name = c("legendary", "attack", "defense"), attr_types = c("num", "num", "num"))
