@@ -190,27 +190,27 @@ sigmoid <- function(x) {
 
 # function to load all required packages
 requiredPackages <- function(modeltype) {
-  if (!require(shiny)) {
+  if (!requireNamespace("shiny", quietly=TRUE)) {
     install.packages("shiny")
     library(shiny)
   }
-  if (!require(shinythemes)) {
+  if (!requireNamespace("shinythemes", quietly=TRUE)) {
     install.packages("shinythemes")
     library(shinythemes)
   }
-  if (modeltype == "dt_rpart" && !require(rpart)) {
+  if (modeltype == "dt_rpart" && !requireNamespace("rpart", quietly=TRUE)) {
     install.packages("rpart")
     library(rpart)
   }
-  if (modeltype == "dt_party" && !require(party)) {
+  if (modeltype == "dt_party" && !requireNamespace("party", quietly=TRUE)) {
     install.packages("party")
     library(party)
   }
-  if (modeltype == "svm" && !require(e1071)) {
+  if (modeltype == "svm" && !requireNamespace("e1071", quietly=TRUE)) {
     install.packages("e1071")
     library(e1071)
   }
-  if (modeltype == "rf" && !require(randomForest)) {
+  if (modeltype == "rf" && !requireNamespace("randomForest", quietly=TRUE)) {
     install.packages("randomForest")
     library(randomForest)
   }
