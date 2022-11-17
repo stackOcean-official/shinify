@@ -31,7 +31,7 @@ jobs:
         with:
           r-version: ${{ matrix.r-version }}
       - name: install curl
-        run: apt-get update && apt-get install -y
+        run: sudo apt-get update && sudo apt-get install -y
       - name: Install dependencies
         run: |
           install.packages(c("remotes", "rcmdcheck"))
