@@ -192,28 +192,28 @@ sigmoid <- function(x) {
 
 # function to load all required packages
 requiredPackages <- function(modeltype) {
-  if (!requireNamespace("shiny", quietly=TRUE)) {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
     install.packages("shiny", repos = "http://cran.us.r-project.org")
-    library(shiny)
   }
-  if (!requireNamespace("shinythemes", quietly=TRUE)) {
+  if (!requireNamespace("shinythemes", quietly = TRUE)) {
     install.packages("shinythemes", repos = "http://cran.us.r-project.org")
-    library(shinythemes)
   }
-  if (modeltype == "dt_rpart" && !requireNamespace("rpart", quietly=TRUE)) {
+  if (modeltype == "dt_rpart" && !requireNamespace("rpart", quietly = TRUE)) {
     install.packages("rpart", repos = "http://cran.us.r-project.org")
     library(rpart)
   }
-  if (modeltype == "dt_party" && !requireNamespace("party", quietly=TRUE)) {
+  if (modeltype == "dt_party" && !requireNamespace("party", quietly = TRUE)) {
     install.packages("party", repos = "http://cran.us.r-project.org")
     library(party)
   }
-  if (modeltype == "svm" && !requireNamespace("e1071", quietly=TRUE)) {
+  if (modeltype == "svm" && !requireNamespace("e1071", quietly = TRUE)) {
     install.packages("e1071", repos = "http://cran.us.r-project.org")
     library(e1071)
   }
-  if (modeltype == "rf" && !requireNamespace("randomForest", quietly=TRUE)) {
+  if (modeltype == "rf" && !requireNamespace("randomForest", quietly = TRUE)) {
     install.packages("randomForest", repos = "http://cran.us.r-project.org")
     library(randomForest)
   }
+  library(shiny)
+  library(shinythemes)
 }
