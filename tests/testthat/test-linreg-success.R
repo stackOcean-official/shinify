@@ -9,7 +9,9 @@ test_that("Test no Error", {
   # split train and test data
   data <- data.frame(legendary, attack, defense)
   data_train <- data[1:(nrow(data) - 100), ]
+
   # actual linear regression
   lin_reg <- lm(legendary ~ attack + defense, data = data_train)
+
   expect_no_error(shinify(lin_reg))
 })

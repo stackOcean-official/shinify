@@ -127,7 +127,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   )
 
   # Define server function
-  server <- function(input, output) {
+  server <- function(input, output, session) {
     if (csv_input) {
       csv_data <- reactive({
         inFile <- input$upload
