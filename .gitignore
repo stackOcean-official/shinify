@@ -3,4 +3,4 @@
 .RData
 .Ruserdata
 .DS_Store
-/testthat/local-testscript.R
+/tests/local-testscript.R
