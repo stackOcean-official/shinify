@@ -1,4 +1,6 @@
 test_that("Test no Error", {
+  install.packages("randomForest", repos = "http://cran.us.r-project.org")
+  library(randomForest)
   data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
 
   # create variables
