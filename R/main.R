@@ -57,7 +57,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     input_type <- attr_types[-1]
   }
 
-  if (is.element(tolower("csv"), tolower(input_type))) {
+  if (is.element("csv", tolower(input_type))) {
     csv_input <- TRUE
   } else {
     csv_input <- FALSE
@@ -65,15 +65,12 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
 
   if (is.null(attr_names)) {
     model_attr_names <- paste(attr(model$terms, "predvars"))[-1]
-    output_label <- model_attr_names[1]
-    input_label <- model_attr_names[-1]
-    input_count <- length(input_label)
   } else {
     model_attr_names <- attr_names
-    output_label <- model_attr_names[1]
-    input_label <- model_attr_names[-1]
-    input_count <- length(input_label)
   }
+  output_label <- model_attr_names[1]
+  input_label <- model_attr_names[-1]
+  input_count <- length(input_label)
 
   if (length(input_type) != input_count && !csv_input) {
     stop("Mismatch: The number of input variables is not determined correctly.\n If you set the attr_names or attr_types manually, make sure that they meet the requirements of the model.")
@@ -89,11 +86,11 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
           textInput(inputId = "sep", label = "seperator", value = ";"),
           checkboxInput("header", "Header", TRUE),
           fileInput("upload", "Choose CSV File",
-            accept = c(
-              "text/csv",
-              "text/comma-separated-values,text/plain",
-              ".csv"
-            )
+                    accept = c(
+                      "text/csv",
+                      "text/comma-separated-values,text/plain",
+                      ".csv"
+                    )
           ),
           downloadButton("download")
         )
@@ -101,9 +98,9 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
         sidebarPanel(
           # multiple inputs depending on number of expeced regressors from the ml model
           inputs <- lapply(1:input_count, function(i) {
-            if (input_type[i] == "numeric" || input_type[i] == "num" || input_type[i] == "integer" || input_type[i] == "double") {
+            if (tolower(input_type[i]) == "numeric" || tolower(input_type[i]) == "num" || tolower(input_type[i]) == "integer" || tolower(input_type[i]) == "int" || tolower(input_type[i]) == "double") {
               numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
-            } else if (input_type[i] == "string" || input_type[i] == "factor") {
+            } else if (tolower(input_type[i]) == "string" || tolower(input_type[i]) == "factor") {
               textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
             }
           })
@@ -127,7 +124,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
   )
 
   # Define server function
-  server <- function(input, output) {
+  server <- function(input, output, session) {
     if (csv_input) {
       csv_data <- reactive({
         inFile <- input$upload
