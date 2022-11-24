@@ -24,7 +24,7 @@
 #' @importFrom utils install.packages read.csv write.csv
 
 
-shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_types = c()) {
+shinify <- function(model, modeltype = "", app_title = "", variables = c(), variable_types = c(), input_labels = c(), output_label = "", default_input_values = c(), shinytheme = "lumen") {
   # load required packages
   requiredPackages(modeltype)
 
@@ -96,7 +96,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
         )
       } else {
         sidebarPanel(
-          # multiple inputs depending on number of expeced regressors from the ml model
+          # multiple inputs depending on number of expected regressors from the ml model
           inputs <- lapply(1:input_count, function(i) {
             if (tolower(input_type[i]) == "numeric" || tolower(input_type[i]) == "num" || tolower(input_type[i]) == "integer" || tolower(input_type[i]) == "int" || tolower(input_type[i]) == "double") {
               numericInput(inputId = paste0("num", i), label = input_label[i], value = 180)
