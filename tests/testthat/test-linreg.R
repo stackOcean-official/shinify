@@ -12,4 +12,5 @@ test_that("Test no Error", {
   # actual linear regression
   lin_reg <- lm(legendary ~ attack + defense, data = data_train)
   expect_no_error(shinify(lin_reg))
+  expect_error(shinify(model))
 })

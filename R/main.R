@@ -99,7 +99,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
           # multiple inputs depending on number of expeced regressors from the ml model
           inputs <- lapply(1:input_count, function(i) {
             if (tolower(input_type[i]) == "numeric" || tolower(input_type[i]) == "num" || tolower(input_type[i]) == "integer" || tolower(input_type[i]) == "int" || tolower(input_type[i]) == "double") {
-              numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
+              numericInput(inputId = paste0("num", i), label = input_label[i], value = 180)
             } else if (tolower(input_type[i]) == "string" || tolower(input_type[i]) == "factor") {
               textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
             }
