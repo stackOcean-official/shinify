@@ -1,0 +1,12 @@
+{
+  "input": {
+    "num1": 0,
+    "num2": 0
+  },
+  "output": {
+    "prediction": "-0.1534"
+  },
+  "export": {
+
+  }
+}
