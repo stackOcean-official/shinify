@@ -42,6 +42,26 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   ## Check arguments and set internal variables ##
   ################################################
 
+  if (nchar(modeltype) < 1) {
+    warning("You have not passed the type of yor model. The passed modeltype effects your prediction and output values. The default modeltype is set to linear regression.")
+  }
+
+  # Stop if the number of model input names and type does not match up.
+  if (!is.null(variables) && !is.null(variable_types)) {
+    if (length(variables) != length(variable_types)) {
+      stop("Missmatch: The number of set  names and types for model variables does not matchup.")
+    }
+  }
+
+  if (xor(!is.null(variables), !is.null(variable_types))) {
+    if (!is.null(variables)) {
+      stop_msg <- "You have set the name for your variables, but not the type. Please add the 'varible_types' parameter."
+    } else {
+      stop_msg <- "You have set the type for your variables, but not the name Please add the 'varibles' parameter."
+    }
+    stop(stop_msg)
+  }
+
   # check if given model has terms and attributes. So for only dt_party has no model-terms. If not and no additional information from the user stop the code and print msg.
   if (modeltype == "dt_party" || is.null(model$terms)) {
     stop_msg <- "function call:"
@@ -111,10 +131,6 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
     }
   } else {
     input_values <- default_input_values
-  }
-  # Stop if the number of inputs does not match up with the expected ammount by the model.
-  if (length(input_type) != input_count && !csv_upload) {
-    stop("Mismatch: The number of input variables is not determined correctly.\n If you set the attr_names or attr_types manually, make sure that they meet the requirements of the model.")
   }
 
   ################################################

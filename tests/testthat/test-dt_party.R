@@ -14,10 +14,14 @@ test_that("test dt_party success", {
   # actual linear regression
   dt <- ctree(legendary ~ attack + defense, data = data_train)
   expect_no_error(
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"), app_title = "Hello", output_label = "3")
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"), app_theme = "lumen")
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"), csv_upload = TRUE)
     shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"))
-
   )
   expect_error(
     shinify(dt, modeltype = "dt_party")
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"))
+    shinify(dt, modeltype = "dt_party", variable_types = c("numeric", "numeric"))
   )
 })
