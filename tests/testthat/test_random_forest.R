@@ -1,4 +1,6 @@
 test_that("Test no Error", {
+  install.packages("randomForest", repos = "http://cran.us.r-project.org")
+  library(randomForest)
   data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
 
   # create variables
@@ -10,8 +12,8 @@ test_that("Test no Error", {
   data <- data.frame(legendary, attack, defense)
   data_train <- data[1:(nrow(data) - 100), ]
 
-  # actual linear regression
-  lin_reg <- lm(legendary ~ attack + defense, data = data_train)
-
-  expect_no_error(shinify(lin_reg))
+  # actual random forest
+  rf_mod <- randomForest(legendary ~ attack + defense, data = data_train)
+  expect_no_error(shinify(rf_mod))
+  expect_error(shinify(rf_mod, attr_names = c("Eins", "Zwei")))
 })

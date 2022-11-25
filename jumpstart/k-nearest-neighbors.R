@@ -27,4 +27,4 @@ test_data_new <- data.frame(attack, defense)
 predict(knn_mod, test_data_new)
 
 # shinify logistic model
-shinify(knn_mod, modeltype = "knn", title = "your title here")
+shinify(knn_mod, modeltype = "knn")

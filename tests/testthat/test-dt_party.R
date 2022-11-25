@@ -1,4 +1,4 @@
-test_that("test dt_party failure", {
+test_that("test dt_party success", {
   install.packages("party", repos = "http://cran.us.r-project.org")
   library(party)
   data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -13,7 +13,11 @@ test_that("test dt_party failure", {
   data_train <- data[1:(nrow(data) - 100), ]
   # actual linear regression
   dt <- ctree(legendary ~ attack + defense, data = data_train)
+  expect_no_error(
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"))
+
+  )
   expect_error(
-    shinify(dt, modeltype = "dt_party", title = "your title here")
+    shinify(dt, modeltype = "dt_party")
   )
 })

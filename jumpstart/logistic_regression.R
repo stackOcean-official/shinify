@@ -32,4 +32,4 @@ sigmoid <- function(x) {
 sigmoid(predict(log_reg, test_data_new))
 
 # shinify logistic model
-shinify(log_reg, modeltype = "log_reg", title = "your title here")
+shinify(log_reg, modeltype = "log_reg")

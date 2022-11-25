@@ -7,40 +7,50 @@
 #' Shiny Server
 #'
 #' This function creates a shiny server for your model
-#' @param model Your R model
-#' @param modeltype Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
-#' @param title Optional: add a Headline to your shiny server
-#' @param attr_names Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.
-#' @param attr_types Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values. If CSV is part of your input types, it will ignore all others.
+#' @param model RModel, Your R model used in the prediction on your shiny server.
+#' @param modeltype String, Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.
+#' @param variables Vector, Set name of input variables your model is expecting. Optional if your model has 'model$terms' attribute. NOTE: if values are not equal to model$terms, you will get an error.
+#' @param variable_types Vector, Set type of input variables your model is expecting. Optional if your model has 'model$terms' attribute. NOTE: if values are not equal to model$terms, you will get an error.
+#' @param csv_upload Boolean, Set TRUE if you want to upload a CSV file as input. Default value is set to FALSE.
+#' @param app_title String, Optional: Add a Headline to your shiny server
+#' @param app_theme String, Optional: Set the shiny theme you want to use. Default theme is "lumen".
+#' @param input_labels Vector, Optional: Set displayed name of your input variables. Does not effect the name of your input variables used in prediction.
+#' @param output_labels String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.
+#' @param default_input_values Vector, Optional: Set default values for your input variables when starting the shiny server.
 #' @keywords shiny
 #' @export
 #' @examples
 #' shinify(model)
 #' shinify(model, "log_reg")
-#' shinify(model, "log_reg", "your awesome title")
-#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
-#' shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense"), c("numeric", "numeric", "numeric"))
+#' shinify(model, "log_reg", app_title = "your awesome title")
+#' shinify(model, "log_reg", app_title = "your awesome title", csv_upload = TRUE)
+#' shinify(model, "dt_party", app_title = "your awesome title", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"))
+#' shinify(model, "dt_party", app_title = "your awesome title", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"), default_input_values = c("180", "290"))
 #' @importFrom stats predict
 #' @importFrom utils install.packages read.csv write.csv
 
 
-shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_types = c()) {
-  # load required packages
+shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c()) {
+  # load required packages depending on the modeltype
   requiredPackages(modeltype)
 
   # set port for shiny server
   options(shiny.port = 8000)
   options(shiny.host = "0.0.0.0")
 
-  # check if given model has terms and attributes. If not and no additional information from the user stop the code and print msg.
+  ################################################
+  ## Check arguments and set internal variables ##
+  ################################################
+
+  # check if given model has terms and attributes. So for only dt_party has no model-terms. If not and no additional information from the user stop the code and print msg.
   if (modeltype == "dt_party" || is.null(model$terms)) {
     stop_msg <- "function call:"
     count <- 0
-    if (is.null(attr_names)) {
+    if (is.null(variables)) {
       stop_msg <- paste(stop_msg, "\n You have not set the names for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_names`.")
       count <- count + 1
     }
-    if (is.null(attr_types)) {
+    if (is.null(variable_types)) {
       stop_msg <- paste(stop_msg, "\n You have not set the type for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_types`.")
       count <- count + 1
     }
@@ -50,68 +60,99 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     }
   }
 
-  # set attr names and type from model (first = output, rest = input)
-  if (is.null(attr_types)) {
+  # check for the type of dependent variables. If not set by the user, we get them from the model.
+  if (is.null(variable_types)) {
     input_type <- paste(attr(model$terms, "dataClasses"))[-1]
   } else {
-    input_type <- attr_types[-1]
+    input_type <- sapply(variable_types, function(x) {
+      if (tolower(x) == "numeric" || tolower(x) == "num" || tolower(x) == "integer" || tolower(x) == "int" || tolower(x) == "double") {
+        return("numeric")
+      } else if (tolower(x) == "string" || tolower(x) == "character") {
+        return("character")
+      } else if (tolower(x) == "factor") {
+        return("factor")
+      } else {
+        return(NULL)
+      }
+    })
   }
 
-  if (is.element(tolower("csv"), tolower(input_type))) {
-    csv_input <- TRUE
+  # check for the name of dependent variables. If not set by the user, we get them from the model.
+  if (is.null(variables)) {
+    model_terms <- paste(attr(model$terms, "predvars"))[-1]
   } else {
-    csv_input <- FALSE
+    model_terms <- c("output", variables)
   }
 
-  if (is.null(attr_names)) {
-    model_attr_names <- paste(attr(model$terms, "predvars"))[-1]
-    output_label <- model_attr_names[1]
-    input_label <- model_attr_names[-1]
-    input_count <- length(input_label)
+  # the user can set the displayed name of his input and output variables. If not set by the user, they will be equal to the names of his model-terms
+  if (is.null(input_labels)) {
+    input_label <- model_terms[-1]
   } else {
-    model_attr_names <- attr_names
-    output_label <- model_attr_names[1]
-    input_label <- model_attr_names[-1]
-    input_count <- length(input_label)
+    input_label <- input_labels
   }
 
-  if (length(input_type) != input_count && !csv_input) {
+  if (nchar(output_label) < 1) {
+    output_label <- model_terms[1]
+  } else {
+    output_label <- output_label
+  }
+
+  input_count <- length(input_label)
+
+  # the user can set default values for his input variables. If not set by the user, they will be 0 for numeric und "Text" for character and factor varibles.
+  if (is.null(default_input_values)) {
+    input_values <- c()
+    for (i in seq(input_count)) {
+      if (input_type[i] == "numeric") {
+        input_values[i] <- 0
+      } else {
+        input_values[i] <- "Text"
+      }
+    }
+  } else {
+    input_values <- default_input_values
+  }
+  # Stop if the number of inputs does not match up with the expected ammount by the model.
+  if (length(input_type) != input_count && !csv_upload) {
     stop("Mismatch: The number of input variables is not determined correctly.\n If you set the attr_names or attr_types manually, make sure that they meet the requirements of the model.")
   }
 
-  # Define UI
+  ################################################
+  ## Define UI                                  ##
+  ################################################
   ui <- fluidPage(
-    theme = shinytheme("lumen"),
-    titlePanel(title),
+    theme = shinytheme(app_theme),
+    titlePanel(app_title),
+    # Build the sidebar / input section depending on the input type. For CSV we create a file-upload and a download button. For single varibales we create input fields.
     sidebarLayout(
-      if (csv_input) {
+      if (csv_upload) {
         sidebarPanel(
           textInput(inputId = "sep", label = "seperator", value = ";"),
           checkboxInput("header", "Header", TRUE),
           fileInput("upload", "Choose CSV File",
-            accept = c(
-              "text/csv",
-              "text/comma-separated-values,text/plain",
-              ".csv"
-            )
+                    accept = c(
+                      "text/csv",
+                      "text/comma-separated-values,text/plain",
+                      ".csv"
+                    )
           ),
           downloadButton("download")
         )
       } else {
         sidebarPanel(
-          # multiple inputs depending on number of expeced regressors from the ml model
+          # multiple inputs depending on number of expected inputs from the model and the type of each input
           inputs <- lapply(1:input_count, function(i) {
-            if (input_type[i] == "numeric" || input_type[i] == "num" || input_type[i] == "integer" || input_type[i] == "double") {
-              numericInput(inputId = paste0("num", i), label = input_label[i], value = 0)
-            } else if (input_type[i] == "string" || input_type[i] == "factor") {
-              textInput(inputId = paste0("num", i), label = input_label[i], value = "Text")
+            if (input_type[i] == "numeric") {
+              numericInput(inputId = paste0("num", i), label = input_label[i], value = as.numeric(input_values[i]))
+            } else if (input_type[i] == "factor" || input_type[i] == "character") {
+              textInput(inputId = paste0("num", i), label = input_label[i], value = input_values[i])
             }
           })
         )
       },
 
-      # Output
-      if (csv_input) {
+      # Build the main panel / output section depending on the input type. For CSV we create a table of the input csv and a row of outputs. For single variables we create a textfield that displays the result.
+      if (csv_upload) {
         mainPanel(
           tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank"),
           h2("Table"),
@@ -119,6 +160,7 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
         )
       } else {
         mainPanel(
+          h2(output_label),
           h2(textOutput(outputId = "prediction")),
           tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank")
         )
@@ -126,9 +168,12 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
     )
   )
 
-  # Define server function
+  ################################################
+  ## Define Server Function                     ##
+  ################################################
   server <- function(input, output, session) {
-    if (csv_input) {
+    # Load server functions depending on the input. For CSV we start a reactive Function to read an uploaded csv and addend a column with predicted output
+    if (csv_upload) {
       csv_data <- reactive({
         inFile <- input$upload
         if (is.null(inFile)) {
@@ -141,11 +186,11 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
         csv_data
       })
     }
-    # Only if input is CSV: Table of Input CSV with additional Column of prediced values
+    # Only if input is CSV: Render table of input CSV with additional column of predicted values
     output$contents <- renderTable({
       output <- csv_data()
     })
-    # Only if input is CSV: Download button to download table of Input CSV with additional Column of prediced values
+    # Only if input is CSV: Download button to download table of Input CSV with additional Column of predicted values
     output$download <- downloadHandler(
       filename = function() {
         paste0("results", ".csv")
@@ -154,27 +199,32 @@ shinify <- function(model, modeltype = "", title = "", attr_names = c(), attr_ty
         write.csv(csv_data(), file)
       }
     )
-    # If input is NOT CSV: Predicts value for given input variables
+    # If input is NOT CSV: Predicts value for given input variables. Therefore we create a data frame of one row containing the given input values.
     output$prediction <- renderText({
       df <- data.frame(matrix(ncol = input_count, nrow = 0))
-      colnames(df) <- input_label
+      colnames(df) <- model_terms[-1]
       df[1, ] <- sapply(1:input_count, function(i) {
         req(input[[paste0("num", i)]])
         input[[paste0("num", i)]]
       })
-      # actual predict function
+      # actual predict function and additional function call for sigmoid if needed
       predicted_output <- predict(model, newdata = df)
       predicted_output <- checkModeltypeRequirements(predicted_output, modeltype)
       paste(round(predicted_output, digits = 4))
     })
   }
 
-  # Create Shiny object
+  ################################################
+  ## Create Shiny Object                        ##
+  ################################################
   shinyApp(ui = ui, server = server)
 }
 
+################################################
+## Additional Function Calls                  ##
+################################################
+# prepare output depending on the requirements by each ml model
 checkModeltypeRequirements <- function(predicted_output, modeltype) {
-  # prepare output depending on the requirements by each ml model
   if (modeltype == "log_reg") {
     predicted_output <- sigmoid(predicted_output)
   }

@@ -27,4 +27,4 @@ test_data_new <- data.frame(attack, defense)
 predict(svm_mod, test_data_new)
 
 # shinify logistic model
-shinify(svm_mod, modeltype = "svm", title = "your title here")
+shinify(svm_mod, modeltype = "svm")

@@ -69,7 +69,7 @@ sigmoid <- function(x) {
 sigmoid(predict(log_reg, test_data_new))
 
 # shinify logistic model
-shinify(log_reg, modeltype = "log_reg", title = "your title here")
+shinify(log_reg, modeltype = "log_reg", app_title = "your title here")
 
 ```
 
@@ -84,13 +84,18 @@ After calling the `shinify()` method with the model, a shiny server is started w
 
 The `shinify()` function creates a shiny server for your model
 
-| Prop       | Type   | Required | Default | Description                                                                                                                                        |
-| ---------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| model      | model  | `yes`    | ""      | Your R model (output from statistics / machine learning algorithm)                                                                                 |
-| modeltype  | string | `no`     | ""      | Abbreviation of your model type that determines. See table below for possible configuration                                                        |
-| title      | string | `no`     | ""      | Sets the title visible in the shiny application                                                                                                    |
-| attr_names | vector | `no`     | c()     | Change the displayed labels for your input and output variables (first element is output label). Mandatory if the passed model has no model terms. |
-| attr_types | vector | `no`      | c()    | Change the type for your input and output variables (first element is output type). Mandatory if the passed model has no model terms. |
+| Prop                  | Type    | Required | Default                  | Description                                                                                                                     |
+| --------------------- | --------| -------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| model                 | model   | `yes`    | ""                       | Your R model (output from statistics / machine learning algorithm)                                                              |
+| modeltype             | string  | `no`     | ""                       | Abbreviation of your model type that determines. See table below for possible configuration                                     |
+| variables             | vector  | `no`     | c()                      | Set name of input variables your model is expecting for prediction. Optional if your model has 'model$terms' attribute.         |
+| variable_types        | vector  | `no`     | c()                      | Set type of input variables your model is expecting for prediction. Optional if your model has 'model$terms' attribute.         |
+| csv_upload            | boolean | `no`     | FALSE                    | Set TRUE if you want to upload a CSV file as input.                                                                             |
+| app_title             | string  | `no`     | "Welcome to shinify"     | Add a Headline to your shiny server.                                                                                            |
+| app_theme             | string  | `no`     | "lumen"                  | Set the shiny theme you want to use.                                                                                            |
+| input_labels          | vector  | `no`     | c()                      | Set displayed name of your input variables. Does not effect the name of your input variables used in prediction.                |
+| output_label          | string  | `no`     | ""                       | Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.                |
+| default_input_values  | vector  | `no`     | c()                      | Set default values for your input variables when starting the shiny server.                                                     |
 
 These are the currently available options for `modeltype`. We are constantly working on adding new models and packages to support with shinify. Please [write an issue](https://github.com/stackOcean-official/shinify/issues/new) if your modeltype is missing 💪
 
@@ -111,10 +116,10 @@ Here are some examples how to call the `shinify` function:
 shinify(model)
 
 # call shinify with a log_reg modeltype and the title "awesome discovery" in the shiny app
-shinify(model, modeltype="log_reg", "awesome discovery")
+shinify(model, modeltype="log_reg", app_title = "awesome discovery")
 
-# call shinify with a svm modeltype and labels for input and outputs
-shinify(model, modeltype="svm", "your awesome title", c("output", "input 1", "input 2"))
+# call shinify with a svm modeltype and labels for input values
+shinify(model, modeltype="svm", app_title = "your awesome title", input_labels = c("Attack Value", "Defense Value"))
 ```
 
 ## Contributing
