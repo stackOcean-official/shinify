@@ -34,9 +34,9 @@ shinify(
 
 \item{input_labels}{Vector, Optional: Set displayed name of your input variables. Does not effect the name of your input variables used in prediction.}
 
-\item{default_input_values}{Vector, Optional: Set default values for your input variables when starting the shiny server.}
+\item{output_label}{String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.}
 
-\item{output_labels}{String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.}
+\item{default_input_values}{Vector, Optional: Set default values for your input variables when starting the shiny server.}
 }
 \description{
 This function creates a shiny server for your model

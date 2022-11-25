@@ -120,6 +120,9 @@ shinify(model, modeltype="log_reg", app_title = "awesome discovery")
 
 # call shinify with a svm modeltype and labels for input values
 shinify(model, modeltype="svm", app_title = "your awesome title", input_labels = c("Attack Value", "Defense Value"))
+
+# call shinify with a model that has no model$terms
+shinify(model, "dt_party", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"))
 ```
 
 ## Contributing

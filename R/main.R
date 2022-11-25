@@ -15,7 +15,7 @@
 #' @param app_title String, Optional: Add a Headline to your shiny server
 #' @param app_theme String, Optional: Set the shiny theme you want to use. Default theme is "lumen".
 #' @param input_labels Vector, Optional: Set displayed name of your input variables. Does not effect the name of your input variables used in prediction.
-#' @param output_labels String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.
+#' @param output_label String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.
 #' @param default_input_values Vector, Optional: Set default values for your input variables when starting the shiny server.
 #' @keywords shiny
 #' @export
