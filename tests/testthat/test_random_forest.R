@@ -1,4 +1,4 @@
-test_that("Test no Error", {
+test_that("Test random forest", {
   install.packages("randomForest", repos = "http://cran.us.r-project.org")
   library(randomForest)
   data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
@@ -14,6 +14,6 @@ test_that("Test no Error", {
 
   # actual random forest
   rf_mod <- randomForest(legendary ~ attack + defense, data = data_train)
-  expect_no_error(shinify(rf_mod))
-  expect_error(shinify(rf_mod, attr_names = c("Eins", "Zwei")))
+  expect_no_error(shinify(rf_mod, modeltype = "rf"))
+  expect_error(shinify(rf_mod, variables = c("Eins", "Zwei")))
 })

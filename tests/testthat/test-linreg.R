@@ -1,4 +1,4 @@
-test_that("Test no Error", {
+test_that("Test linear regression", {
   data <- read.csv("https://github.com/stackOcean-official/hostr/files/9681827/pokemon.csv")
 
   # create variables

@@ -146,11 +146,11 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
           textInput(inputId = "sep", label = "seperator", value = ";"),
           checkboxInput("header", "Header", TRUE),
           fileInput("upload", "Choose CSV File",
-                    accept = c(
-                      "text/csv",
-                      "text/comma-separated-values,text/plain",
-                      ".csv"
-                    )
+            accept = c(
+              "text/csv",
+              "text/comma-separated-values,text/plain",
+              ".csv"
+            )
           ),
           downloadButton("download")
         )
