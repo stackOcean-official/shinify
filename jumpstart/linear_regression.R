@@ -26,4 +26,4 @@ test_data_new <- data.frame(attack, defense)
 predict(lin_reg, test_data_new)
 
 # shinify linear regression
-shinify(lin_reg, modeltype = "lin_reg", title = "your title here")
+shinify(lin_reg, modeltype = "lin_reg")

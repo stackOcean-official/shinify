@@ -27,4 +27,4 @@ test_data_new <- data.frame(attack, defense)
 predict(rf_mod, newdata = data_test)
 
 # shinify random forest model
-shinify(rf_mod, modeltype = "rf", title = "your title here")
+shinify(rf_mod, modeltype = "rf")

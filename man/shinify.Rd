@@ -4,18 +4,39 @@
 \alias{shinify}
 \title{Shiny Server}
 \usage{
-shinify(model, modeltype = "", title = "", attr_names = c(), attr_types = c())
+shinify(
+  model,
+  modeltype = "",
+  variables = c(),
+  variable_types = c(),
+  csv_upload = FALSE,
+  app_title = "Welcome to shinify",
+  app_theme = "lumen",
+  input_labels = c(),
+  output_label = "",
+  default_input_values = c()
+)
 }
 \arguments{
-\item{model}{Your R model}
+\item{model}{RModel, Your R model used in the prediction on your shiny server.}
 
-\item{modeltype}{Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.}
+\item{modeltype}{String, Abbreviation of your model type (e.g. "log_reg", "rf"). We are constantly working on adding new models and packages to support with shinify. Look up in jumpstart folder for currently supported models.}
 
-\item{title}{Optional: add a Headline to your shiny server}
+\item{variables}{Vector, Set name of input variables your model is expecting. Optional if your model has 'model$terms' attribute. NOTE: if values are not equal to model$terms, you will get an error.}
 
-\item{attr_names}{Change the displayed labels for your input and output variables. Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values.}
+\item{variable_types}{Vector, Set type of input variables your model is expecting. Optional if your model has 'model$terms' attribute. NOTE: if values are not equal to model$terms, you will get an error.}
 
-\item{attr_types}{Change the type of your input and output variables (e.g. "numeric", "factor", "integer"). Mandatory if the passed model has no model terms. Note: the first value is output and the rest are the input values. If CSV is part of your input types, it will ignore all others.}
+\item{csv_upload}{Boolean, Set TRUE if you want to upload a CSV file as input. Default value is set to FALSE.}
+
+\item{app_title}{String, Optional: Add a Headline to your shiny server}
+
+\item{app_theme}{String, Optional: Set the shiny theme you want to use. Default theme is "lumen".}
+
+\item{input_labels}{Vector, Optional: Set displayed name of your input variables. Does not effect the name of your input variables used in prediction.}
+
+\item{default_input_values}{Vector, Optional: Set default values for your input variables when starting the shiny server.}
+
+\item{output_labels}{String, Optional: Set displayed name of your output variable. Does not effect the name of your output variable used in prediction.}
 }
 \description{
 This function creates a shiny server for your model
@@ -23,8 +44,9 @@ This function creates a shiny server for your model
 \examples{
 shinify(model)
 shinify(model, "log_reg")
-shinify(model, "log_reg", "your awesome title")
-shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"))
-shinify(model, "log_reg", "your awesome title", c("output", "input1", "input2"), c("legendary", "attack", "defense"), c("numeric", "numeric", "numeric"))
+shinify(model, "log_reg", app_title = "your awesome title")
+shinify(model, "log_reg", app_title = "your awesome title", csv_upload = TRUE)
+shinify(model, "dt_party", app_title = "your awesome title", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"))
+shinify(model, "dt_party", app_title = "your awesome title", variables = c("attack", "defense"), variable_types = c("numeric", "numeric"), default_input_values = c("180", "290"))
 }
 \keyword{shiny}
