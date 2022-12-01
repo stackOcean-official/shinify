@@ -65,19 +65,21 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
 
   # check for the type of dependent variables. If not set by the user, we get them from the model.
   if (is.null(variable_types)) {
-    input_type <- tryCatch( {
-      paste(attr(model$terms, "dataClasses"))[-1]
-    },
-    error = function(e) {
-      stop_msg <- "Error in shinify(): \n Your passed model does not contain the following information: model$terms."
-      stop_msg <- paste(stop_msg, "\n Considder adding the vector `variable_types`.")
-      if (is.null(variables)) {
-        stop_msg <- paste(stop_msg, "\n Considder adding the vector `variables`.")
+    input_type <- tryCatch(
+      {
+        paste(attr(model$terms, "dataClasses"))[-1]
+      },
+      error = function(e) {
+        stop_msg <- "Error in shinify(): \n Your passed model does not contain the following information: model$terms."
+        stop_msg <- paste(stop_msg, "\n Considder adding the vector `variable_types`.")
+        if (is.null(variables)) {
+          stop_msg <- paste(stop_msg, "\n Considder adding the vector `variables`.")
+        }
+        message(stop_msg)
+        message("Here's the original error message:")
+        message(e)
       }
-      message(stop_msg)
-      message("Here's the original error message:")
-      message(e)
-    })
+    )
   } else {
     input_type <- sapply(variable_types, function(x) {
       if (tolower(x) == "numeric" || tolower(x) == "num" || tolower(x) == "integer" || tolower(x) == "int" || tolower(x) == "double") {
@@ -222,11 +224,13 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
       predicted_output <- tryCatch(
         {
           predict(model, newdata = df)
-        }, error = function(e) {
+        },
+        error = function(e) {
           message("Error in shinify(): \n Your passed values do not match with your model. NOTE: the column names of your training data have to match the 'variables' names.")
           message("Here's the original warning message:")
           message(e)
-        })
+        }
+      )
       predicted_output <- checkModeltypeRequirements(predicted_output, modeltype)
       paste(round(predicted_output, digits = 4))
     })
