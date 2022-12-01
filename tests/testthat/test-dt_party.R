@@ -34,4 +34,7 @@ test_that("test dt_party", {
   expect_error(
     shinify(dt, modeltype = "dt_party", variable_types = c("numeric", "numeric"))
   )
+  expect_error(
+    shinify(dt, modeltype = "dt_party", variables = c("attack", "defense"), variable_types = c("num", "turnschuh"))
+  )
 })

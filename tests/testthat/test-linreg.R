@@ -12,7 +12,9 @@ test_that("Test linear regression", {
   # actual linear regression
   lin_reg <- lm(legendary ~ attack + defense, data = data_train)
   expect_warning(shinify(lin_reg))
-  expect_error(shinify(model))
+  expect_error(shinify(model, modeltype = "lin_reg"))
+  expect_error(shinify(model, modeltype = "lin_reg", variables = c("attack", "defense")))
+  expect_error(shinify(model, modeltype = "lin_reg", variables = c("attack", "defense"), variable_types = c("num", "turnschuh")))
   expect_no_error(shinify(lin_reg, modeltype = "lin_reg"))
   expect_no_error(shinify(lin_reg, modeltype = "lin_reg", input_labels = c("1", "2")))
   expect_no_error(shinify(lin_reg, modeltype = "lin_reg", app_title = "Hello"))

@@ -15,5 +15,5 @@ test_that("Test random forest", {
   # actual random forest
   rf_mod <- randomForest(legendary ~ attack + defense, data = data_train)
   expect_no_error(shinify(rf_mod, modeltype = "rf"))
-  expect_error(shinify(rf_mod, variables = c("Eins", "Zwei")))
+  expect_error(shinify(rf_mod, modeltype = "rf", variables = c("Eins", "Zwei")))
 })

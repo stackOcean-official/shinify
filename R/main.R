@@ -43,7 +43,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   ################################################
 
   if (nchar(modeltype) < 1) {
-    warning("You have not passed the type of yor model. The passed modeltype effects your prediction and output values. The default modeltype is set to linear regression.")
+    warning("Warning: You have not passed the type of yor model. The passed modeltype effects your prediction and output values. The default modeltype is set to linear regression.")
   }
 
   # Stop if the number of model input names and type does not match up.
@@ -54,35 +54,30 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   }
 
   if (xor(!is.null(variables), !is.null(variable_types))) {
+    stop_msg <- "Error in shinify(): \n"
     if (!is.null(variables)) {
-      stop_msg <- "You have set the name for your variables, but not the type. Please add the 'varible_types' parameter."
+      stop_msg <- paste(stop_msg, "You have set the name for your variables, but not the type. Please add the 'varible_types' parameter.")
     } else {
-      stop_msg <- "You have set the type for your variables, but not the name Please add the 'varibles' parameter."
+      stop_msg <- paste(stop_msg, "You have set the type for your variables, but not the name Please add the 'varibles' parameter.")
     }
     stop(stop_msg)
   }
 
-  # check if given model has terms and attributes. So for only dt_party has no model-terms. If not and no additional information from the user stop the code and print msg.
-  if (modeltype == "dt_party" || is.null(model$terms)) {
-    stop_msg <- "function call:"
-    count <- 0
-    if (is.null(variables)) {
-      stop_msg <- paste(stop_msg, "\n You have not set the names for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_names`.")
-      count <- count + 1
-    }
-    if (is.null(variable_types)) {
-      stop_msg <- paste(stop_msg, "\n You have not set the type for your model attributes and the passed model does not contain this information.\n Considder adding the vector `attr_types`.")
-      count <- count + 1
-    }
-    if (count >= 1) {
-      stop_msg <- paste(stop_msg, "\n Note: First value is output and the rest are the input values.")
-      stop(stop_msg)
-    }
-  }
-
   # check for the type of dependent variables. If not set by the user, we get them from the model.
   if (is.null(variable_types)) {
-    input_type <- paste(attr(model$terms, "dataClasses"))[-1]
+    input_type <- tryCatch( {
+      paste(attr(model$terms, "dataClasses"))[-1]
+    },
+    error = function(e) {
+      stop_msg <- "Error in shinify(): \n Your passed model does not contain the following information: model$terms."
+      stop_msg <- paste(stop_msg, "\n Considder adding the vector `variable_types`.")
+      if (is.null(variables)) {
+        stop_msg <- paste(stop_msg, "\n Considder adding the vector `variables`.")
+      }
+      message(stop_msg)
+      message("Here's the original error message:")
+      message(e)
+    })
   } else {
     input_type <- sapply(variable_types, function(x) {
       if (tolower(x) == "numeric" || tolower(x) == "num" || tolower(x) == "integer" || tolower(x) == "int" || tolower(x) == "double") {
@@ -92,7 +87,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
       } else if (tolower(x) == "factor") {
         return("factor")
       } else {
-        return(NULL)
+        stop("Error in shinify(): \n Your 'variable_types' do not meet the requirements of shinify(). \n You can choos between numeric, character and factor types.")
       }
     })
   }
@@ -224,7 +219,14 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
         input[[paste0("num", i)]]
       })
       # actual predict function and additional function call for sigmoid if needed
-      predicted_output <- predict(model, newdata = df)
+      predicted_output <- tryCatch(
+        {
+          predict(model, newdata = df)
+        }, error = function(e) {
+          message("Error in shinify(): \n Your passed values do not match with your model. NOTE: the column names of your training data have to match the 'variables' names.")
+          message("Here's the original warning message:")
+          message(e)
+        })
       predicted_output <- checkModeltypeRequirements(predicted_output, modeltype)
       paste(round(predicted_output, digits = 4))
     })
