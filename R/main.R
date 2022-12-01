@@ -194,7 +194,8 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
         }
         csv_data <- read.csv(inFile$datapath, header = input$header, sep = input$sep)
         csv_data$output <- predict(model, newdata = csv_data)
-        csv_data$output <- checkModeltypeRequirements(csv_data$output, modeltype)
+        print(csv_data$output)
+        csv_data$output <- checkModeltypeRequirements(csv_data$output, modeltype, csv_upload)
         colnames(csv_data)[ncol(csv_data)] <- output_label
         csv_data
       })
@@ -246,12 +247,16 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
 ## Additional Function Calls                  ##
 ################################################
 # prepare output depending on the requirements by each ml model
-checkModeltypeRequirements <- function(predicted_output, modeltype) {
+checkModeltypeRequirements <- function(predicted_output, modeltype, csv_upload) {
   if (modeltype == "log_reg") {
     predicted_output <- sigmoid(predicted_output)
   }
   if (modeltype == "dt_rpart") {
-    predicted_output <- predicted_output[2]
+    if (csv_upload) {
+      predicted_output <- predicted_output[ ,2]
+    } else {
+      predicted_output <- predicted_output[2]
+    }
   }
   return(predicted_output)
 }
