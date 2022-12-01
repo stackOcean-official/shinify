@@ -194,7 +194,6 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
         }
         csv_data <- read.csv(inFile$datapath, header = input$header, sep = input$sep)
         csv_data$output <- predict(model, newdata = csv_data)
-        print(csv_data$output)
         csv_data$output <- checkModeltypeRequirements(csv_data$output, modeltype, csv_upload)
         colnames(csv_data)[ncol(csv_data)] <- output_label
         csv_data
