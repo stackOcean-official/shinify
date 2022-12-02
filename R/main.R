@@ -49,7 +49,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   # Stop if the number of model input names and type does not match up.
   if (!is.null(variables) && !is.null(variable_types)) {
     if (length(variables) != length(variable_types)) {
-      stop("Missmatch: The number of set  names and types for model variables does not matchup.")
+      stop("Missmatch: The number of set  names and types for model variables do not matchup.")
     }
   }
 
