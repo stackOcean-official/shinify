@@ -63,7 +63,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
     stop(stop_msg)
   }
 
-  # check for the type of dependent variables. If not set by the user, we get them from the model.
+  # check for the type of independent variables. If not set by the user, we get them from the model.
   if (is.null(variable_types)) {
     input_type <- tryCatch(
       {
