@@ -71,9 +71,9 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
       },
       error = function(e) {
         stop_msg <- "Error in shinify(): \n Your passed model does not contain the following information: model$terms."
-        stop_msg <- paste(stop_msg, "\n Considder adding the vector `variable_types`.")
+        stop_msg <- paste(stop_msg, "\n Consider adding the vector `variable_types`.")
         if (is.null(variables)) {
-          stop_msg <- paste(stop_msg, "\n Considder adding the vector `variables`.")
+          stop_msg <- paste(stop_msg, "\n Consider adding the vector `variables`.")
         }
         message(stop_msg)
         message("Here's the original error message:")
@@ -89,12 +89,12 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
       } else if (tolower(x) == "factor") {
         return("factor")
       } else {
-        stop("Error in shinify(): \n Your 'variable_types' do not meet the requirements of shinify(). \n You can choos between numeric, character and factor types.")
+        stop("Error in shinify(): \n Your 'variable_types' do not meet the requirements of shinify(). \n You can choose between numeric, character and factor types.")
       }
     })
   }
 
-  # check for the name of dependent variables. If not set by the user, we get them from the model.
+  # check for the name of independent variables. If not set by the user, we get them from the model.
   if (is.null(variables)) {
     model_terms <- paste(attr(model$terms, "predvars"))[-1]
   } else {
@@ -116,7 +116,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
 
   input_count <- length(input_label)
 
-  # the user can set default values for his input variables. If not set by the user, they will be 0 for numeric und "Text" for character and factor varibles.
+  # the user can set default values for his input variables. If not set by the user, they will be 0 for numeric and "Text" for character and factor variables.
   if (is.null(default_input_values)) {
     input_values <- c()
     for (i in seq(input_count)) {
