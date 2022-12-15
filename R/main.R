@@ -31,6 +31,8 @@
 
 
 shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c()) {
+
+  # Check for directory and create if needed
   mainDir <- getwd()
   subDir <- "./shinify"
   modelDir <- "./shinify/model"
@@ -134,7 +136,7 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   }
 
   ################################################
-  ## Build Conditional Script                   ##
+  ## Build UI                                   ##
   ################################################
   newScript <- paste0("
 #
@@ -289,7 +291,7 @@ server <- function(input, output) {
   }
 
   ################################################
-  ## Create Shiny Object                        ##
+  ## Save Shiny App and Model                   ##
   ################################################
   newScript <- paste0(newScript, "
   shinyApp(ui = ui, server = server)")
@@ -301,7 +303,7 @@ server <- function(input, output) {
 }
 
 
-# function to load all required packages
+# function to load all required packages TODO: check if needed
 requiredPackages <- function(modeltype) {
   reqPackages <- "
 library(shiny)
