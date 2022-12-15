@@ -31,12 +31,15 @@
 
 
 shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c()) {
-  # load required packages depending on the modeltype
-  requiredPackages(modeltype)
-
-  # set port for shiny server
-  options(shiny.port = 8000)
-  options(shiny.host = "0.0.0.0")
+  mainDir <- getwd()
+  subDir <- "./shinify"
+  modelDir <- "./shinify/model"
+  if (!file.exists(subDir)) {
+    dir.create(file.path(subDir), showWarnings = FALSE)
+    dir.create(file.path(modelDir), showWarnings = FALSE)
+  } else if (!file.exists(modelDir)) {
+    dir.create(file.path(modelDir), showWarnings = FALSE)
+  }
 
   ################################################
   ## Check arguments and set internal variables ##
@@ -131,143 +134,179 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   }
 
   ################################################
-  ## Define UI                                  ##
+  ## Build Conditional Script                   ##
   ################################################
-  ui <- fluidPage(
-    theme = shinytheme(app_theme),
-    titlePanel(app_title),
-    # Build the sidebar / input section depending on the input type. For CSV we create a file-upload and a download button. For single varibales we create input fields.
-    sidebarLayout(
-      if (csv_upload) {
-        sidebarPanel(
-          textInput(inputId = "sep", label = "seperator", value = ";"),
-          checkboxInput("header", "Header", TRUE),
-          fileInput("upload", "Choose CSV File",
-            accept = c(
-              "text/csv",
-              "text/comma-separated-values,text/plain",
-              ".csv"
-            )
-          ),
-          downloadButton("download")
-        )
-      } else {
-        sidebarPanel(
-          # multiple inputs depending on number of expected inputs from the model and the type of each input
-          inputs <- lapply(1:input_count, function(i) {
-            if (input_type[i] == "numeric") {
-              numericInput(inputId = paste0("num", i), label = input_label[i], value = as.numeric(input_values[i]))
-            } else if (input_type[i] == "factor" || input_type[i] == "character") {
-              textInput(inputId = paste0("num", i), label = input_label[i], value = input_values[i])
-            }
-          })
-        )
-      },
+  newScript <- paste0("
+#
+# This is a Shiny web application created with shinify(). You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about shinify() here:
+#
+#    https://github.com/stackOcean-official/shinify
+#
 
-      # Build the main panel / output section depending on the input type. For CSV we create a table of the input csv and a row of outputs. For single variables we create a textfield that displays the result.
-      if (csv_upload) {
+", requiredPackages(modeltype), "
+
+options(shiny.port = 8000)
+options(shiny.host = '0.0.0.0')
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    theme = shinytheme('", app_theme, "'),
+    titlePanel('", app_title, "'),
+    sidebarLayout(")
+
+  if (csv_upload) {
+    newScript <- paste0(newScript, "
+        sidebarPanel(
+            textInput(inputId = 'sep', label = 'seperator', value = ';'),
+            checkboxInput('header', 'Header', TRUE),
+            fileInput('upload', 'Choose CSV File',
+                accept = c(
+                  'text/csv',
+                  'text/comma-separated-values,text/plain',
+                  '.csv'
+                )
+            ),
+            downloadButton('download')
+          ),
         mainPanel(
-          tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank"),
-          h2("Table"),
-          tableOutput("contents")
-        )
-      } else {
-        mainPanel(
-          h2(output_label),
-          h2(textOutput(outputId = "prediction")),
-          tags$a(href = "https://stackocean.com", "provided by stackOcean", target = "_blank")
-        )
+          tags$a(href = 'https://stackocean.com', 'provided by stackOcean', target = '_blank'),
+          h2('Table'),
+          tableOutput('contents')
+          )")
+  } else {
+    newScript <- paste0(newScript, "
+        sidebarPanel(")
+    for (var in (1:input_count)) {
+      if (input_type[var] == "numeric") {
+        newScript <- paste0(newScript, "
+            numericInput(inputId = paste0('num',", var, "), label = '", input_label[var], "', value = ", as.numeric(input_values[var]), "),")
+      } else if (input_type[var] == "factor" || input_type[var] == "character") {
+        newScript <- paste0(newScript, "
+            textInput(inputId = paste0('num',", var, "), label = '", input_label[var], "', value = ", input_values[var], "),")
       }
-    )
-  )
+    }
+    newScript <- paste0(newScript, "
+        ),
+        mainPanel(
+          h2('", output_label, "'),
+          h2(textOutput(outputId = 'prediction')),
+          tags$a(href = 'https://stackocean.com', 'provided by stackOcean', target = '_blank')
+          )")
+  }
+  newScript <- paste0(newScript, "
+      )
+  )")
 
   ################################################
   ## Define Server Function                     ##
   ################################################
-  server <- function(input, output, session) {
-    # Load server functions depending on the input. For CSV we start a reactive Function to read an uploaded csv and addend a column with predicted output
-    if (csv_upload) {
+  if (csv_upload) {
+    newScript <- paste0(newScript, "
+  server <- function(input, output) {
+
+      model <- readRDS('./model/model.rds')
       csv_data <- reactive({
         inFile <- input$upload
         if (is.null(inFile)) {
           return(NULL)
         }
         csv_data <- read.csv(inFile$datapath, header = input$header, sep = input$sep)
-        csv_data$output <- predict(model, newdata = csv_data)
-        csv_data$output <- checkModeltypeRequirements(csv_data$output, modeltype, csv_upload)
-        colnames(csv_data)[ncol(csv_data)] <- output_label
+        csv_data$output <- predict(model, newdata = csv_data)")
+    if (modeltype == "dt_rpart") {
+      newScript <- paste0(newScript, "
+        csv_data$output <- csv_data$output[, 2]")
+    }
+    if (modeltype == "log_reg") {
+      newScript <- paste0(newScript, "
+        csv_data$output <- sigmoid(csv_data$output)")
+    }
+    newScript <- paste0(newScript, "
+        colnames(csv_data)[ncol(csv_data)] <- '", output_label, "'
         csv_data
       })
-    }
-    # Only if input is CSV: Render table of input CSV with additional column of predicted values
-    output$contents <- renderTable({
-      output <- csv_data()
-    })
-    # Only if input is CSV: Download button to download table of Input CSV with additional Column of predicted values
-    output$download <- downloadHandler(
-      filename = function() {
-        paste0("results", ".csv")
+      output$contents <- renderTable({
+        output <- csv_data()
+      })
+      output$download <- downloadHandler(
+        filename = function() {
+          paste0('results', '.csv')
       },
       content = function(file) {
         write.csv(csv_data(), file)
       }
     )
-    # If input is NOT CSV: Predicts value for given input variables. Therefore we create a data frame of one row containing the given input values.
+  }")
+
+  } else {
+    model_terms_string <- paste0("'", model_terms[-1], "'", collapse = ",")
+    model_terms_string <- paste0("c(", model_terms_string, ")")
+    newScript <- paste0(newScript, "
+server <- function(input, output) {
+
+    model <- readRDS('./model/model.rds')
     output$prediction <- renderText({
-      df <- data.frame(matrix(ncol = input_count, nrow = 0))
-      colnames(df) <- model_terms[-1]
-      df[1, ] <- sapply(1:input_count, function(i) {
-        req(input[[paste0("num", i)]])
-        input[[paste0("num", i)]]
-      })
-      # actual predict function and additional function call for sigmoid if needed
-      predicted_output <- tryCatch(
+        df <- data.frame(matrix(ncol =", input_count, ", nrow = 0))
+        colnames(df) <-", model_terms_string, "
+        df[1, ] <- sapply(1:", input_count, ", function(i) {
+          req(input[[paste0('num', i)]])
+          input[[paste0('num', i)]]
+        })
+    # actual predict function and additional function call for sigmoid if needed
+    predicted_output <- tryCatch(
         {
           predict(model, newdata = df)
         },
         error = function(e) {
-          message("Error in shinify(): \n Your passed values do not match with your model. NOTE: the column names of your training data have to match the 'variables' names.")
-          message("Here's the original warning message:")
+          message('Error in shinify(): Your passed values do not match with your model. NOTE: the column names of your training data have to match the variables names.')
+          message('Here is the original warning message:')
           message(e)
         }
-      )
-      predicted_output <- checkModeltypeRequirements(predicted_output, modeltype)
+    )")
+    if (modeltype == "log_reg") {
+      newScript <- paste0(newScript, "
+      predicted_output <- sigmoid(predicted_output)")
+    }
+    if (modeltype == "dt_rpart") {
+      newScript <- paste0(newScript, "
+      predicted_output <- predicted_output[2]")
+    }
+    newScript <- paste0(newScript, "
       paste(round(predicted_output, digits = 4))
     })
+  }")
+  }
+  if (modeltype == "log_reg") {
+    newScript <- paste0(newScript, "
+  # sigmoid function to correct output if using a log_reg
+  sigmoid <- function(x) {
+    result <- exp(x) / (1 + exp(x))
+    return(result)
+  }")
   }
 
   ################################################
   ## Create Shiny Object                        ##
   ################################################
-  shinyApp(ui = ui, server = server)
+  newScript <- paste0(newScript, "
+  shinyApp(ui = ui, server = server)")
+
+  fileConn<-file("shinify/app.R")
+  writeLines(newScript, fileConn)
+  close(fileConn)
+  saveRDS(model, "shinify/model/model.rds")
 }
 
-################################################
-## Additional Function Calls                  ##
-################################################
-# prepare output depending on the requirements by each ml model
-checkModeltypeRequirements <- function(predicted_output, modeltype, csv_upload) {
-  if (modeltype == "log_reg") {
-    predicted_output <- sigmoid(predicted_output)
-  }
-  if (modeltype == "dt_rpart") {
-    if (csv_upload) {
-      predicted_output <- predicted_output[ ,2]
-    } else {
-      predicted_output <- predicted_output[2]
-    }
-  }
-  return(predicted_output)
-}
-
-# sigmoid function to correct output if using a log_reg
-sigmoid <- function(x) {
-  result <- exp(x) / (1 + exp(x))
-  return(result)
-}
 
 # function to load all required packages
 requiredPackages <- function(modeltype) {
+  reqPackages <- "
+library(shiny)
+library(shinythemes)
+  "
   if (!requireNamespace("shiny", quietly = TRUE)) {
     install.packages("shiny", repos = "http://cran.us.r-project.org")
   }
@@ -276,20 +315,23 @@ requiredPackages <- function(modeltype) {
   }
   if (modeltype == "dt_rpart" && !requireNamespace("rpart", quietly = TRUE)) {
     install.packages("rpart", repos = "http://cran.us.r-project.org")
-    library(rpart)
+    reqPackages <- paste0(reqPackages, "
+library(rpart)")
   }
   if (modeltype == "dt_party" && !requireNamespace("party", quietly = TRUE)) {
     install.packages("party", repos = "http://cran.us.r-project.org")
-    library(party)
+    reqPackages <- paste0(reqPackages, "
+library(party)")
   }
   if (modeltype == "svm" && !requireNamespace("e1071", quietly = TRUE)) {
     install.packages("e1071", repos = "http://cran.us.r-project.org")
-    library(e1071)
+    reqPackages <- paste0(reqPackages, "
+library(e1071)")
   }
   if (modeltype == "rf" && !requireNamespace("randomForest", quietly = TRUE)) {
     install.packages("randomForest", repos = "http://cran.us.r-project.org")
-    library(randomForest)
+    reqPackages <- paste0(reqPackages, "
+library(randomForest)")
   }
-  library(shiny)
-  library(shinythemes)
+  return(reqPackages)
 }
