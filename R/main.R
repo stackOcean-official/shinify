@@ -312,14 +312,15 @@ server <- function(input, output, session) {
     if (compareScripts[1] != compareScripts[2]) {
       cat("An app.R file already exists and will be overwritten.")
       check <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
-      if (check == "No") stop("Aborted.", call. = FALSE)
-      cat(paste0("overwriting app.R in ", mainDir, subDir), fill = TRUE)
+      print(check)
+      if (check == 2) stop("Process aborted.", call. = FALSE)
+      cat(paste0("Overwriting app.R in ", mainDir, subDir), fill = TRUE)
       fileConn <- file("shinify/app.R")
       writeLines(newScript, fileConn)
       close(fileConn)
     }
   } else {
-    cat(paste0("writing app.R to", mainDir, subDir), fill = TRUE)
+    cat(paste0("Writing app.R to", mainDir, subDir), fill = TRUE)
     fileConn <- file("shinify/app.R")
     writeLines(newScript, fileConn)
     close(fileConn)
@@ -331,12 +332,12 @@ server <- function(input, output, session) {
     if (compareModel[1] != compareModel[2]) {
       cat("A model.RDS file already exists and will be overwritten.")
       checkModel <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
-      if (checkModel == "No") stop("Aborted.", call. = FALSE)
-      cat(paste0("overwriting model.RDS in ", mainDir, modelDir), fill = TRUE)
+      if (checkModel == 2) stop("Process aborted.", call. = FALSE)
+      cat(paste0("Overwriting model.RDS in ", mainDir, modelDir), fill = TRUE)
       saveRDS(model, "shinify/model/model.rds")
     }
   } else {
-    cat(paste0("writing model.RDS to", mainDir, modelDir), fill = TRUE)
+    cat(paste0("Writing model.RDS to", mainDir, modelDir), fill = TRUE)
     saveRDS(model, "shinify/model/model.rds")
   }
 
