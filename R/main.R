@@ -31,7 +31,10 @@
 
 
 shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c(), runApp = TRUE) {
+
   library(shiny)
+  library(openssl)
+
   # Check for directory and create if needed
   mainDir <- getwd()
   subDir <- "/shinify"
@@ -246,7 +249,7 @@ ui <- fluidPage(
     model_terms_string <- paste0("'", model_terms[-1], "'", collapse = ",")
     model_terms_string <- paste0("c(", model_terms_string, ")")
     newScript <- paste0(newScript, "
-server <- function(input, output) {
+server <- function(input, output, session) {
 
     model <- readRDS('./model/model.rds')
     output$prediction <- renderText({
@@ -278,7 +281,11 @@ server <- function(input, output) {
     newScript <- paste0(newScript, "
       paste(round(predicted_output, digits = 4))
     })
-  }")
+    session$onSessionEnded(function() {
+      cat('closing shiny app...')
+      stopApp()
+  })
+}")
   }
   if (modeltype == "log_reg") {
     newScript <- paste0(newScript, "
@@ -299,23 +306,42 @@ server <- function(input, output) {
   fileConn <- file("shinify/.app.R")
   writeLines(newScript, fileConn)
   close(fileConn)
-  compareScripts <- tools::md5sum(c("shinify/.app.R", "shinify/app.R"))
-  if (is.na(compareScripts[2])) {
+
+  if (file.exists("shinify/app.R")) {
+    compareScripts <- tools::md5sum(c("shinify/.app.R", "shinify/app.R"))
+    if (compareScripts[1] != compareScripts[2]) {
+      cat("An app.R file already exists and will be overwritten.")
+      check <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
+      if (check == "No") stop("Aborted.", call. = FALSE)
+      cat(paste0("overwriting app.R in ", mainDir, subDir), fill = TRUE)
+      fileConn <- file("shinify/app.R")
+      writeLines(newScript, fileConn)
+      close(fileConn)
+    }
+  } else {
     cat(paste0("writing app.R to", mainDir, subDir), fill = TRUE)
     fileConn <- file("shinify/app.R")
     writeLines(newScript, fileConn)
     close(fileConn)
-  } else if (compareScripts[1] != compareScripts[2]) {
-    cat("An app.R file already exists and will be overwritten.")
-    check <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
-    if (check == "n") stop("Aborted.", call. = FALSE)
-    cat(paste0("overwriting app.R in", mainDir, subDir), fill = TRUE)
-    fileConn <- file("shinify/app.R")
-    writeLines(newScript, fileConn)
-    close(fileConn)
   }
+
+  if (file.exists("shinify/model/model.rds") && modeltype != "dt_party") {
+    savedModel <- readRDS('shinify/model/model.rds')
+    compareModel <- md5(c(toString(savedModel), toString(model)))
+    if (compareModel[1] != compareModel[2]) {
+      cat("A model.RDS file already exists and will be overwritten.")
+      checkModel <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
+      if (checkModel == "No") stop("Aborted.", call. = FALSE)
+      cat(paste0("overwriting model.RDS in ", mainDir, modelDir), fill = TRUE)
+      saveRDS(model, "shinify/model/model.rds")
+    }
+  } else {
+    cat(paste0("writing model.RDS to", mainDir, modelDir), fill = TRUE)
+    saveRDS(model, "shinify/model/model.rds")
+  }
+
   file.remove("shinify/.app.R")
-  saveRDS(model, "shinify/model/model.rds")
+
   if (runApp) {
     cat("starting shiny app...", fill = TRUE)
     runApp("./shinify")
