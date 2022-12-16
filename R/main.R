@@ -30,12 +30,12 @@
 #' @importFrom utils install.packages read.csv write.csv
 
 
-shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c()) {
-
+shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c(), runApp = TRUE) {
+  library(shiny)
   # Check for directory and create if needed
   mainDir <- getwd()
-  subDir <- "./shinify"
-  modelDir <- "./shinify/model"
+  subDir <- "/shinify"
+  modelDir <- "/shinify/model"
   if (!file.exists(subDir)) {
     dir.create(file.path(subDir), showWarnings = FALSE)
     dir.create(file.path(modelDir), showWarnings = FALSE)
@@ -242,7 +242,6 @@ ui <- fluidPage(
       }
     )
   }")
-
   } else {
     model_terms_string <- paste0("'", model_terms[-1], "'", collapse = ",")
     model_terms_string <- paste0("c(", model_terms_string, ")")
@@ -290,16 +289,37 @@ server <- function(input, output) {
   }")
   }
 
-  ################################################
-  ## Save Shiny App and Model                   ##
-  ################################################
   newScript <- paste0(newScript, "
   shinyApp(ui = ui, server = server)")
 
-  fileConn<-file("shinify/app.R")
+  ################################################
+  ## Save Shiny App and Model                   ##
+  ################################################
+
+  fileConn <- file("shinify/.app.R")
   writeLines(newScript, fileConn)
   close(fileConn)
+  compareScripts <- tools::md5sum(c("shinify/.app.R", "shinify/app.R"))
+  if (is.na(compareScripts[2])) {
+    cat(paste0("writing app.R to", mainDir, subDir), fill = TRUE)
+    fileConn <- file("shinify/app.R")
+    writeLines(newScript, fileConn)
+    close(fileConn)
+  } else if (compareScripts[1] != compareScripts[2]) {
+    cat("An app.R file already exists and will be overwritten.")
+    check <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
+    if (check == "n") stop("Aborted.", call. = FALSE)
+    cat(paste0("overwriting app.R in", mainDir, subDir), fill = TRUE)
+    fileConn <- file("shinify/app.R")
+    writeLines(newScript, fileConn)
+    close(fileConn)
+  }
+  file.remove("shinify/.app.R")
   saveRDS(model, "shinify/model/model.rds")
+  if (runApp) {
+    cat("starting shiny app...", fill = TRUE)
+    runApp("./shinify")
+  }
 }
 
 
