@@ -31,7 +31,6 @@
 
 
 shinify <- function(model, modeltype = "", variables = c(), variable_types = c(), csv_upload = FALSE, app_title = "Welcome to shinify", app_theme = "lumen", input_labels = c(), output_label = "", default_input_values = c(), runApp = TRUE) {
-
   library(shiny)
   library(openssl)
 
@@ -326,11 +325,24 @@ server <- function(input, output, session) {
     close(fileConn)
   }
 
-  if (file.exists("shinify/model/model.rds") && modeltype != "dt_party") {
-    savedModel <- readRDS('shinify/model/model.rds')
-    compareModel <- md5(c(toString(savedModel), toString(model)))
-    if (compareModel[1] != compareModel[2]) {
-      cat("A model.RDS file already exists and will be overwritten.")
+  if (file.exists("shinify/model/model.rds")) {
+    savedModel <- readRDS("shinify/model/model.rds")
+    msg <- tryCatch(
+      {
+        compareModel <- md5(c(toString(savedModel), toString(model)))
+        if (compareModel[1] != compareModel[2]) {
+          msg <- "A different model.RDS file already exists and will be overwritten. "
+        } else {
+          msg <- ""
+        }
+        msg
+      },
+      error = function(e) {
+        return("A model.RDS file already exists that can not be compared and will be overwritten. ")
+      }
+    )
+    if (nchar(msg) > 1) {
+      cat(msg)
       checkModel <- menu(c("Yes", "No"), title = "Do you wish to continue? (y/n)")
       if (checkModel == 2) stop("Process aborted.", call. = FALSE)
       cat(paste0("Overwriting model.RDS in ", mainDir, modelDir), fill = TRUE)
