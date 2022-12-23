@@ -39,10 +39,10 @@ shinify <- function(model, modeltype = "", variables = c(), variable_types = c()
   subDir <- "/shinify"
   modelDir <- "/shinify/model"
   if (!file.exists(subDir)) {
-    dir.create(file.path(subDir), showWarnings = FALSE)
-    dir.create(file.path(modelDir), showWarnings = FALSE)
+    dir.create(file.path(mainDir, subDir), showWarnings = FALSE)
+    dir.create(file.path(mainDir, modelDir), showWarnings = FALSE)
   } else if (!file.exists(modelDir)) {
-    dir.create(file.path(modelDir), showWarnings = FALSE)
+    dir.create(file.path(mainDir, modelDir), showWarnings = FALSE)
   }
 
   ################################################
